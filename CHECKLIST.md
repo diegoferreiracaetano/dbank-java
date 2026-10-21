@@ -55,7 +55,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
 
 Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Idempotency-Key` e guarda o estado (`PENDING`, `COMPLETED`, `FAILED`). Ainda sem Kafka: a ligação com o `ledger` é o M3. Os serviços não compartilham código, só contratos.
 
-- [ ] **M2.1 Convenções de build compartilhadas.** `build-logic` com um plugin de convenção (qualidade, testes e Spring Boot), aplicado primeiro ao `ledger`. Vem antes do segundo serviço para ele nascer sem duplicar configuração.
+- [x] **M2.1 Convenções de build compartilhadas.** `build-logic` com um plugin de convenção (qualidade, testes e Spring Boot), aplicado primeiro ao `ledger`. Vem antes do segundo serviço para ele nascer sem duplicar configuração.
   - Aprende: convention plugin e included build, a mesma ideia do `build-logic` do Now in Android.
 - [ ] **M2.2 Esqueleto do `dbank-payments`.** Módulo, porta 8082, banco `payments` no mesmo Postgres do compose, Redis no compose, health `UP`.
 - [ ] **M2.3 Domínio.** `Transfer` com máquina de estados (`PENDING` para `COMPLETED` ou `FAILED`), `Money` e ids próprios.
