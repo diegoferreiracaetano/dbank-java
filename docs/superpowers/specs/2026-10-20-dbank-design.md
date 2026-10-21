@@ -103,7 +103,18 @@ Cada marco deixa o projeto rodando e apresentável; dá para parar em qualquer u
 
 Fora do roteiro por decisão (YAGNI): CQRS, gRPC, SonarQube/PIT.
 
-## 5. Premissas
+## 5. Como trabalhamos
+
+O foco do projeto é o Diego aprender; o código é construído em conjunto, não entregue pronto.
+
+- O progresso vive no `CHECKLIST.md`, em itens pequenos, agrupados por marco.
+- Um item por vez: o Claude explica o conceito e o porquê antes, o Diego escreve ou revisa o código junto, e o item só é marcado como feito depois que o Diego testa e confirma.
+- Nenhum código de marco futuro é escrito antecipadamente, e o Claude não executa o roteiro sozinho.
+- Cada marco termina com perguntas de entrevista sobre o que foi construído.
+- Commits só ao fim de uma alteração grande, sem `Co-Authored-By`.
+- Os testes rodados são os do item em curso; suítes completas ficam para o fechamento do marco.
+
+## 6. Premissas
 
 - Linguagem Java (a vaga pede Java), diferente do DBook em Kotlin.
 - Cloud AWS apenas como infraestrutura como código; não há deploy real obrigatório.
