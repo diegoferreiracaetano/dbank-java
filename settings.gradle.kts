@@ -9,3 +9,4 @@ plugins {
 rootProject.name = "dbank"
 
 include("dbank-ledger")
+include("dbank-payments")
