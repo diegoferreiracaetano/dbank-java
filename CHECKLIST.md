@@ -41,7 +41,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: contrato como fonte de verdade e como impedir que a documentação envelheça.
 - [x] **M1.11 ArchUnit.** Regras: `domain` e `application` não dependem de `adapter` nem de Spring.
   - Aprende: como a arquitetura é imposta por teste, e não por convenção.
-- [ ] **M1.12 Fechamento.** Rodar a suíte completa, revisar o README do serviço e responder as perguntas de entrevista abaixo.
+- [x] **M1.12 Fechamento.** Rodar a suíte completa, revisar o README do serviço e responder as perguntas de entrevista abaixo.
 
 ### Perguntas de entrevista do M1
 
@@ -51,7 +51,25 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
 4. Locking otimista ou pessimista para saldo? Quando você escolheria o outro?
 5. O que o ArchUnit protege que o code review não protege?
 
-## M2 a M9
+## M2 — `dbank-payments` sozinho
+
+Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Idempotency-Key` e guarda o estado (`PENDING`, `COMPLETED`, `FAILED`). Ainda sem Kafka: a ligação com o `ledger` é o M3. Os serviços não compartilham código, só contratos.
+
+- [ ] **M2.1 Convenções de build compartilhadas.** `build-logic` com um plugin de convenção (qualidade, testes e Spring Boot), aplicado primeiro ao `ledger`. Vem antes do segundo serviço para ele nascer sem duplicar configuração.
+  - Aprende: convention plugin e included build, a mesma ideia do `build-logic` do Now in Android.
+- [ ] **M2.2 Esqueleto do `dbank-payments`.** Módulo, porta 8082, banco `payments` no mesmo Postgres do compose, Redis no compose, health `UP`.
+- [ ] **M2.3 Domínio.** `Transfer` com máquina de estados (`PENDING` para `COMPLETED` ou `FAILED`), `Money` e ids próprios.
+  - Aprende: por que cada serviço tem seu próprio `Money` em vez de uma biblioteca compartilhada.
+- [ ] **M2.4 Casos de uso e portas.** Solicitar e consultar transferência, portas de repositório e de idempotência, fakes.
+- [ ] **M2.5 Flyway e adapter JPA.** `transfer` e `idempotency_key` com unicidade.
+- [ ] **M2.6 Idempotência com Redis.** `Idempotency-Key` com `SET NX` e TTL como caminho rápido, constraint única no Postgres como garantia final, e detecção de reuso da chave com corpo diferente.
+  - Aprende: cache como otimização e o banco como fonte da verdade.
+- [ ] **M2.7 Adapter REST.** `POST /v1/transfers` (202), `GET /v1/transfers/{id}` e `problem+json`.
+- [ ] **M2.8 Testes de integração e ArchUnit.** Postgres e Redis via Testcontainers e as regras de arquitetura do `payments`.
+- [ ] **M2.9 Documentação.** OpenAPI versionado, README do serviço e README da raiz.
+- [ ] **M2.10 Fechamento.** Clone limpo e perguntas de entrevista do M2.
+
+## M3 a M9
 
 Detalhados quando o marco anterior fechar. Ver seção 4 da spec.
 

@@ -62,3 +62,4 @@ O Swagger UI fica em `http://localhost:8081/swagger-ui.html`. O passo a passo pa
 - Contrato da API: [`docs/api/ledger-openapi.yaml`](docs/api/ledger-openapi.yaml)
 - Desenho e decisões: [spec](docs/superpowers/specs/2026-10-20-dbank-design.md)
 - Plano e pendências técnicas: [CHECKLIST.md](CHECKLIST.md)
+- Roteiro de estudo para entrevista: [docs/interview/m1-ledger.md](docs/interview/m1-ledger.md)
