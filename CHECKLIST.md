@@ -27,7 +27,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: o que é ledger e por que não se atualiza saldo "no escuro".
 - [x] **M1.4 Portas e caso de uso.** `PostTransferUseCase` (porta de entrada) e `AccountRepository` / `LedgerEntryRepository` (portas de saída), com teste usando fakes.
   - Aprende: o que são portas e adaptadores na prática.
-- [ ] **M1.5 Flyway.** `V1` com `account` e `ledger_entry`, constraints e índices justificados.
+- [x] **M1.5 Flyway.** `V1` com `account` e `ledger_entry`, constraints e índices justificados.
   - Aprende: migrações versionadas, constraints como última linha de defesa.
 - [ ] **M1.6 Adapter JPA.** Entidades JPA separadas do domínio, mapper entre os dois, implementação das portas de saída.
   - Aprende: por que a entidade JPA não é a entidade de domínio.
