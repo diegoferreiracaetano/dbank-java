@@ -1,9 +1,9 @@
 package com.diegoferreiracaetano.dbank.ledger.domain;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.junit.jupiter.api.Test;
 
 class AccountTest {
 
@@ -30,8 +30,7 @@ class AccountTest {
     void shouldRejectDebitAboveBalance() {
         var account = Account.open().credit(Money.ofCents(100));
 
-        assertThatThrownBy(() -> account.debit(Money.ofCents(101)))
-                .isInstanceOf(InsufficientFundsException.class);
+        assertThatThrownBy(() -> account.debit(Money.ofCents(101))).isInstanceOf(InsufficientFundsException.class);
     }
 
     @Test

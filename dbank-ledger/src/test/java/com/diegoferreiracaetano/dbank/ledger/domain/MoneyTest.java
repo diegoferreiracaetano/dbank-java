@@ -1,16 +1,15 @@
 package com.diegoferreiracaetano.dbank.ledger.domain;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.junit.jupiter.api.Test;
 
 class MoneyTest {
 
     @Test
     void shouldRejectNegativeAmount() {
-        assertThatThrownBy(() -> Money.ofCents(-1))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Money.ofCents(-1)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -28,7 +27,8 @@ class MoneyTest {
 
     @Test
     void shouldCompareAmounts() {
-        assertThat(Money.ofCents(100).isGreaterThanOrEqualTo(Money.ofCents(100))).isTrue();
+        assertThat(Money.ofCents(100).isGreaterThanOrEqualTo(Money.ofCents(100)))
+                .isTrue();
         assertThat(Money.ofCents(99).isGreaterThanOrEqualTo(Money.ofCents(100))).isFalse();
     }
 }
