@@ -25,7 +25,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: por que nunca usar ponto flutuante para dinheiro, e como um domínio isolado é testado sem framework.
 - [x] **M1.3 Domínio: `LedgerEntry` e partida dobrada.** Toda movimentação gera um débito e um crédito de mesmo valor; a soma dos lançamentos é zero. Lançamentos são imutáveis.
   - Aprende: o que é ledger e por que não se atualiza saldo "no escuro".
-- [ ] **M1.4 Portas e caso de uso.** `PostTransferUseCase` (porta de entrada) e `AccountRepository` / `LedgerEntryRepository` (portas de saída), com teste usando fakes.
+- [x] **M1.4 Portas e caso de uso.** `PostTransferUseCase` (porta de entrada) e `AccountRepository` / `LedgerEntryRepository` (portas de saída), com teste usando fakes.
   - Aprende: o que são portas e adaptadores na prática.
 - [ ] **M1.5 Flyway.** `V1` com `account` e `ledger_entry`, constraints e índices justificados.
   - Aprende: migrações versionadas, constraints como última linha de defesa.
