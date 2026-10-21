@@ -1,4 +1,6 @@
-package com.diegoferreiracaetano.dbank.ledger.domain;
+package com.diegoferreiracaetano.dbank.ledger.domain.ledger;
+
+import com.diegoferreiracaetano.dbank.ledger.domain.shared.Money;
 
 public class UnbalancedTransactionException extends RuntimeException {
 

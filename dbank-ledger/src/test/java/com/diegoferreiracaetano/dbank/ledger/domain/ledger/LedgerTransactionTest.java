@@ -1,8 +1,10 @@
-package com.diegoferreiracaetano.dbank.ledger.domain;
+package com.diegoferreiracaetano.dbank.ledger.domain.ledger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.diegoferreiracaetano.dbank.ledger.domain.account.AccountId;
+import com.diegoferreiracaetano.dbank.ledger.domain.shared.Money;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

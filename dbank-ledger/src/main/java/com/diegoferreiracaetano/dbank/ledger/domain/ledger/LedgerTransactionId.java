@@ -1,4 +1,4 @@
-package com.diegoferreiracaetano.dbank.ledger.domain;
+package com.diegoferreiracaetano.dbank.ledger.domain.ledger;
 
 import java.util.UUID;
 

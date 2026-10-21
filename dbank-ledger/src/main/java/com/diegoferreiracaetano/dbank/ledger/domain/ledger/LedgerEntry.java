@@ -1,5 +1,7 @@
-package com.diegoferreiracaetano.dbank.ledger.domain;
+package com.diegoferreiracaetano.dbank.ledger.domain.ledger;
 
+import com.diegoferreiracaetano.dbank.ledger.domain.account.AccountId;
+import com.diegoferreiracaetano.dbank.ledger.domain.shared.Money;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;

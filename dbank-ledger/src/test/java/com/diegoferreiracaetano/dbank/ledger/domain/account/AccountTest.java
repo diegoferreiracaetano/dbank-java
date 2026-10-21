@@ -1,8 +1,9 @@
-package com.diegoferreiracaetano.dbank.ledger.domain;
+package com.diegoferreiracaetano.dbank.ledger.domain.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.diegoferreiracaetano.dbank.ledger.domain.shared.Money;
 import org.junit.jupiter.api.Test;
 
 class AccountTest {

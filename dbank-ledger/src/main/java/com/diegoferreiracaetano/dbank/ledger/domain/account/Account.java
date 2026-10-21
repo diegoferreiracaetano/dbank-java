@@ -1,4 +1,6 @@
-package com.diegoferreiracaetano.dbank.ledger.domain;
+package com.diegoferreiracaetano.dbank.ledger.domain.account;
+
+import com.diegoferreiracaetano.dbank.ledger.domain.shared.Money;
 
 public record Account(AccountId id, Money balance) {
 

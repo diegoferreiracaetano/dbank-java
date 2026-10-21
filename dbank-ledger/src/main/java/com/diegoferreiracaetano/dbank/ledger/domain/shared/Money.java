@@ -1,4 +1,4 @@
-package com.diegoferreiracaetano.dbank.ledger.domain;
+package com.diegoferreiracaetano.dbank.ledger.domain.shared;
 
 public record Money(long cents) {
 

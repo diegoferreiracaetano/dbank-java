@@ -1,7 +1,9 @@
-package com.diegoferreiracaetano.dbank.ledger.domain;
+package com.diegoferreiracaetano.dbank.ledger.domain.ledger;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.diegoferreiracaetano.dbank.ledger.domain.account.AccountId;
+import com.diegoferreiracaetano.dbank.ledger.domain.shared.Money;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 

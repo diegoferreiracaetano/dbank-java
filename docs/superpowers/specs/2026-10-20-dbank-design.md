@@ -68,13 +68,21 @@ Abordagem escolhida: Transactional Outbox + saga coreografada por Kafka. Alterna
 Hexagonal em `payments` e `ledger`, um módulo por serviço:
 
 ```
-domain/        entidades, value objects, regras (sem Spring nem JPA)
-application/   casos de uso + portas (in: UseCase; out: Repository, EventPublisher)
+domain/        regras (sem Spring nem JPA), separado por conceito:
+  shared/        Money e tipos comuns
+  account/       Account, AccountId, InsufficientFundsException
+  ledger/        LedgerEntry, LedgerTransaction e tipos relacionados
+application/   casos de uso + portas
+  port.in/       casos de uso (UseCase)
+  port.out/      Repository, EventPublisher
+  service/       implementação dos casos de uso
 adapter/in/    rest/, kafka/ (consumers)
 adapter/out/   persistence/ (JPA), messaging/ (outbox relay), cache/ (Redis)
 ```
 
-ArchUnit impõe que `domain` e `application` não importem `adapter` nem Spring.
+A separação por responsabilidade vale dentro de cada camada, e os testes espelham os mesmos pacotes. Pastas só são criadas quando há código nelas.
+
+ArchUnit impõe que `domain` e `application` não importem `adapter` nem Spring, e que não haja ciclos entre os pacotes de domínio (`shared` ← `account` ← `ledger`).
 
 Dados (Postgres, um banco por serviço, migrações Flyway):
 
