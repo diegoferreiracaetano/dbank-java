@@ -33,7 +33,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: por que a entidade JPA não é a entidade de domínio.
 - [x] **M1.7 Locking otimista.** Campo `version` em `account`, tratamento de conflito e teste de concorrência com duas transferências na mesma conta.
   - Aprende: otimista vs pessimista, e o que acontece sob corrida.
-- [ ] **M1.8 Adapter REST de apoio.** Criar conta, consultar saldo e extrato, com OpenAPI e erros em `problem+json`. Serve para exercitar o serviço até o Kafka entrar no M3.
+- [x] **M1.8 Adapter REST de apoio.** Criar conta, consultar saldo e extrato, com OpenAPI e erros em `problem+json`. Serve para exercitar o serviço até o Kafka entrar no M3.
   - Aprende: adapter de entrada fino, sem regra de negócio.
 - [ ] **M1.9 Testes de integração.** Testcontainers com Postgres cobrindo repositório e fluxo de transferência. Inclui os testes permanentes que no M1.6 e M1.7 foram provados só por testes descartáveis: ida e volta no banco, rollback real, gravação velha rejeitada com `ConcurrentUpdateException` e transferências concorrentes sem perda de atualização.
   - Aprende: teste de integração sem mock de banco.
@@ -52,3 +52,13 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
 ## M2 a M9
 
 Detalhados quando o marco anterior fechar. Ver seção 4 da spec.
+
+## Backlog técnico
+
+Decisões adiadas de propósito, com o gatilho para retomá-las.
+
+- **`IllegalArgumentException` virando 400.** Trocar por uma exceção de domínio dedicada quando existir um segundo caso além de "transferir para a mesma conta"; hoje qualquer bug que lance esse tipo viraria 400 em vez de 500.
+- **`ApiExceptionHandler` único.** Dividir por assunto (negócio, framework, segurança) quando chegar a segurança (M6) ou passar de uns 8 handlers. Alternativa que escala melhor: exceções de negócio com um `kind` semântico e um único handler.
+- **Paginação do extrato por offset.** Trocar por cursor (`created_at`, `id`) no M6, quando medirmos o custo de páginas profundas.
+- **`save` de `LedgerTransaction` faz `SELECT` antes.** Id atribuído e sem `@Version` leva o Spring Data ao `merge`. Medir no M6 e, se pesar, usar `Persistable` ou `EntityManager.persist`.
+- **Conta `treasury` com saldo finito.** Simplificação de dev, porque `Money` não admite negativo; um ledger real deixa a conta de origem ficar negativa.

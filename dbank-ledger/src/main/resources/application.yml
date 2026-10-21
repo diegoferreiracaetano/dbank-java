@@ -8,6 +8,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/ledger
     username: dbank
     password: dbank
+  flyway:
+    ignore-migration-patterns: "repeatable:missing"
   jpa:
     hibernate:
       ddl-auto: validate

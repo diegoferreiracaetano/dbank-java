@@ -7,8 +7,10 @@ checkstyle = "14.3.0"
 jacoco = "0.8.15"
 spotbugs-tool = "4.10.5"
 commons-lang3 = "3.21.0"
+springdoc = "2.8.17"
 
 [libraries]
+springdoc-openapi-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 spotbugs-tool = { module = "com.github.spotbugs:spotbugs", version.ref = "spotbugs-tool" }
 commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
 

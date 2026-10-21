@@ -17,6 +17,9 @@ class LedgerEntryEntity {
     @Id
     private UUID id;
 
+    @Column(name = "transaction_id", insertable = false, updatable = false)
+    private UUID transactionId;
+
     @Column(name = "account_id", nullable = false)
     private UUID accountId;
 
@@ -42,6 +45,10 @@ class LedgerEntryEntity {
 
     UUID getId() {
         return id;
+    }
+
+    UUID getTransactionId() {
+        return transactionId;
     }
 
     UUID getAccountId() {
