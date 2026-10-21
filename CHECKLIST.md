@@ -29,7 +29,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: o que são portas e adaptadores na prática.
 - [x] **M1.5 Flyway.** `V1` com `account` e `ledger_entry`, constraints e índices justificados.
   - Aprende: migrações versionadas, constraints como última linha de defesa.
-- [ ] **M1.6 Adapter JPA.** Entidades JPA separadas do domínio, mapper entre os dois, implementação das portas de saída.
+- [x] **M1.6 Adapter JPA.** Entidades JPA separadas do domínio, mapper entre os dois, implementação das portas de saída.
   - Aprende: por que a entidade JPA não é a entidade de domínio.
 - [ ] **M1.7 Locking otimista.** Campo `version` em `account`, tratamento de conflito e teste de concorrência com duas transferências na mesma conta.
   - Aprende: otimista vs pessimista, e o que acontece sob corrida.
