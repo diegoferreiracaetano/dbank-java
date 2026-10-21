@@ -6,7 +6,7 @@ Um item por vez. Marcar `[x]` só depois que o Diego testou e confirmou. Spec: `
 
 Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em partida dobrada, com saldo seguro sob concorrência. Sem Kafka e sem `payments` ainda.
 
-- [ ] **M1.1 Esqueleto.** Projeto Gradle com Java 21 e Spring Boot, módulo `dbank-ledger`, pacote `com.diegoferreiracaetano.dbank.ledger`, Postgres via Docker Compose, aplicação subindo.
+- [x] **M1.1 Esqueleto.** Projeto Gradle com Java 21 e Spring Boot, módulo `dbank-ledger`, pacote `com.diegoferreiracaetano.dbank.ledger`, Postgres via Docker Compose, aplicação subindo.
   - Aprende: estrutura de módulos, por que um banco por serviço.
 - [ ] **M1.2 Domínio: `Money` e `Account`.** Value object de dinheiro (centavos em `long`, sem `double`), conta com regra de saldo. Java puro, sem Spring.
   - Aprende: por que nunca usar ponto flutuante para dinheiro, e como um domínio isolado é testado sem framework.
