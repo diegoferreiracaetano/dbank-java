@@ -58,7 +58,7 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
 - [x] **M2.1 Convenções de build compartilhadas.** `build-logic` com um plugin de convenção (qualidade, testes e Spring Boot), aplicado primeiro ao `ledger`. Vem antes do segundo serviço para ele nascer sem duplicar configuração.
   - Aprende: convention plugin e included build, a mesma ideia do `build-logic` do Now in Android.
 - [x] **M2.2 Esqueleto do `dbank-payments`.** Módulo, porta 8082, banco `payments` no mesmo Postgres do compose, Redis no compose, health `UP`.
-- [ ] **M2.3 Domínio.** `Transfer` com máquina de estados (`PENDING` para `COMPLETED` ou `FAILED`), `Money` e ids próprios.
+- [x] **M2.3 Domínio.** `Transfer` com máquina de estados (`PENDING` para `COMPLETED` ou `FAILED`), `Money` e ids próprios.
   - Aprende: por que cada serviço tem seu próprio `Money` em vez de uma biblioteca compartilhada.
 - [ ] **M2.4 Casos de uso e portas.** Solicitar e consultar transferência, portas de repositório e de idempotência, fakes.
 - [ ] **M2.5 Flyway e adapter JPA.** `transfer` e `idempotency_key` com unicidade.
