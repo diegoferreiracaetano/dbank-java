@@ -27,4 +27,20 @@ class AccountMapperTest {
 
         assertThat(result).isEqualTo(account);
     }
+
+    @Test
+    void givenNewAccount_whenMappingToEntity_thenShouldHaveNoVersion() {
+        var entity = AccountMapper.toEntity(new Account(AccountId.generate(), Money.ofCents(750)));
+
+        assertThat(entity.getVersion()).isNull();
+    }
+
+    @Test
+    void givenAccountWithVersion_whenMappingToEntityAndBack_thenShouldKeepVersion() {
+        var account = new Account(AccountId.generate(), Money.ofCents(750), 5L);
+
+        var result = AccountMapper.toDomain(AccountMapper.toEntity(account));
+
+        assertThat(result.version()).isEqualTo(5L);
+    }
 }

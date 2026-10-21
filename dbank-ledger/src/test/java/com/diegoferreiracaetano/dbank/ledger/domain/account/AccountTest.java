@@ -42,4 +42,27 @@ class AccountTest {
 
         assertThat(original.balance()).isEqualTo(Money.ofCents(500));
     }
+
+    @Test
+    void givenNewAccount_whenOpening_thenShouldHaveNoVersion() {
+        assertThat(Account.open().version()).isNull();
+    }
+
+    @Test
+    void givenAccountWithVersion_whenDebiting_thenShouldKeepVersion() {
+        var account = new Account(AccountId.generate(), Money.ofCents(500), 3L);
+
+        var result = account.debit(Money.ofCents(200));
+
+        assertThat(result.version()).isEqualTo(3L);
+    }
+
+    @Test
+    void givenAccountWithVersion_whenCrediting_thenShouldKeepVersion() {
+        var account = new Account(AccountId.generate(), Money.ofCents(500), 3L);
+
+        var result = account.credit(Money.ofCents(200));
+
+        assertThat(result.version()).isEqualTo(3L);
+    }
 }

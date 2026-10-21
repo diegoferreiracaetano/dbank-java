@@ -31,11 +31,11 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: migrações versionadas, constraints como última linha de defesa.
 - [x] **M1.6 Adapter JPA.** Entidades JPA separadas do domínio, mapper entre os dois, implementação das portas de saída.
   - Aprende: por que a entidade JPA não é a entidade de domínio.
-- [ ] **M1.7 Locking otimista.** Campo `version` em `account`, tratamento de conflito e teste de concorrência com duas transferências na mesma conta.
+- [x] **M1.7 Locking otimista.** Campo `version` em `account`, tratamento de conflito e teste de concorrência com duas transferências na mesma conta.
   - Aprende: otimista vs pessimista, e o que acontece sob corrida.
 - [ ] **M1.8 Adapter REST de apoio.** Criar conta, consultar saldo e extrato, com OpenAPI e erros em `problem+json`. Serve para exercitar o serviço até o Kafka entrar no M3.
   - Aprende: adapter de entrada fino, sem regra de negócio.
-- [ ] **M1.9 Testes de integração.** Testcontainers com Postgres cobrindo repositório e fluxo de transferência.
+- [ ] **M1.9 Testes de integração.** Testcontainers com Postgres cobrindo repositório e fluxo de transferência. Inclui os testes permanentes que no M1.6 e M1.7 foram provados só por testes descartáveis: ida e volta no banco, rollback real, gravação velha rejeitada com `ConcurrentUpdateException` e transferências concorrentes sem perda de atualização.
   - Aprende: teste de integração sem mock de banco.
 - [ ] **M1.10 ArchUnit.** Regras: `domain` e `application` não dependem de `adapter` nem de Spring.
   - Aprende: como a arquitetura é imposta por teste, e não por convenção.
