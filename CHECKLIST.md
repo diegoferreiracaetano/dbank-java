@@ -60,7 +60,7 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
 - [x] **M2.2 Esqueleto do `dbank-payments`.** Módulo, porta 8082, banco `payments` no mesmo Postgres do compose, Redis no compose, health `UP`.
 - [x] **M2.3 Domínio.** `Transfer` com máquina de estados (`PENDING` para `COMPLETED` ou `FAILED`), `Money` e ids próprios.
   - Aprende: por que cada serviço tem seu próprio `Money` em vez de uma biblioteca compartilhada.
-- [ ] **M2.4 Casos de uso e portas.** Solicitar e consultar transferência, portas de repositório e de idempotência, fakes.
+- [x] **M2.4 Casos de uso e portas.** Solicitar e consultar transferência, portas de repositório e de idempotência, fakes.
 - [ ] **M2.5 Flyway e adapter JPA.** `transfer` e `idempotency_key` com unicidade.
 - [ ] **M2.6 Idempotência com Redis.** `Idempotency-Key` com `SET NX` e TTL como caminho rápido, constraint única no Postgres como garantia final, e detecção de reuso da chave com corpo diferente.
   - Aprende: cache como otimização e o banco como fonte da verdade.
