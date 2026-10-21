@@ -1,0 +1,300 @@
+openapi: 3.1.0
+info:
+  description: |
+    Double-entry ledger: accounts, immutable entries and idempotent transactions.
+    Amounts are integers in cents. Errors follow RFC 9457 (application/problem+json).
+  title: Dbank Ledger API
+  version: 1.0.0
+servers:
+- description: Local development
+  url: http://localhost:8081
+tags:
+- description: Open accounts and read balances and statements
+  name: Accounts
+- description: Post double-entry transactions
+  name: Transactions
+paths:
+  /v1/accounts:
+    post:
+      description: Creates an account with a zero balance.
+      operationId: open
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountResponse"
+          description: Account opened
+          headers:
+            Location:
+              description: Path of the new account
+              schema:
+                type: string
+              style: simple
+      summary: Open an account
+      tags:
+      - Accounts
+  /v1/accounts/{id}:
+    get:
+      description: Returns the account and its current balance in cents.
+      operationId: get
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountResponse"
+          description: The account
+        "400":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:invalid-request
+                title: Invalid request
+                status: 400
+                detail: Cannot transfer to the same account
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: The request is malformed or breaks a validation rule
+        "404":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:account-not-found
+                title: Account not found
+                status: 404
+                detail: "Account not found: 6f1c0a52-3d3e-4c1f-9d4b-2a7f6e0b9a11"
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: An account referenced by the request does not exist
+      summary: Get an account
+      tags:
+      - Accounts
+  /v1/accounts/{id}/entries:
+    get:
+      description: "Ledger entries of the account, newest first. page is zero-based;\
+        \ size defaults to 20."
+      operationId: entries
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          maximum: 100
+          minimum: 1
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EntryResponse"
+          description: "A page of entries, possibly empty"
+        "400":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:invalid-request
+                title: Invalid request
+                status: 400
+                detail: Cannot transfer to the same account
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: The request is malformed or breaks a validation rule
+        "404":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:account-not-found
+                title: Account not found
+                status: 404
+                detail: "Account not found: 6f1c0a52-3d3e-4c1f-9d4b-2a7f6e0b9a11"
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: An account referenced by the request does not exist
+      summary: Get the account statement
+      tags:
+      - Accounts
+  /v1/transactions:
+    post:
+      description: "Debits one account and credits another atomically. Idempotent\
+        \ by transactionId: reposting a posted id changes nothing."
+      operationId: post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostTransactionRequest"
+        required: true
+      responses:
+        "204":
+          description: "Posted, or already posted with the same transactionId"
+        "400":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:invalid-request
+                title: Invalid request
+                status: 400
+                detail: Cannot transfer to the same account
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: The request is malformed or breaks a validation rule
+        "404":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:account-not-found
+                title: Account not found
+                status: 404
+                detail: "Account not found: 6f1c0a52-3d3e-4c1f-9d4b-2a7f6e0b9a11"
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: An account referenced by the request does not exist
+        "409":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:concurrent-update
+                title: Concurrent update
+                status: 409
+                detail: The data was changed by another transaction; retry the operation
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: The data changed during the operation; retry the whole operation
+        "422":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:insufficient-funds
+                title: Insufficient funds
+                status: 422
+                detail: Account 6f1c0a52-3d3e-4c1f-9d4b-2a7f6e0b9a11 has 100 cents
+                  but 300 were requested
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: "A business rule prevents the operation, such as insufficient\
+            \ funds"
+      summary: Post a transaction
+      tags:
+      - Transactions
+components:
+  schemas:
+    AccountResponse:
+      type: object
+      properties:
+        balanceCents:
+          type: integer
+          format: int64
+          description: Current balance in cents
+          example: 1000
+        id:
+          type: string
+          format: uuid
+          description: Account id
+          example: 6f1c0a52-3d3e-4c1f-9d4b-2a7f6e0b9a11
+    EntryResponse:
+      type: object
+      properties:
+        amountCents:
+          type: integer
+          format: int64
+          description: "Entry amount in cents, always positive"
+          example: 300
+        createdAt:
+          type: string
+          format: date-time
+          description: When the entry was recorded (UTC)
+          example: 2026-01-01T00:00:00Z
+        direction:
+          type: string
+          description: "DEBIT removes money from the account, CREDIT adds it"
+          enum:
+          - DEBIT
+          - CREDIT
+        id:
+          type: string
+          format: uuid
+          description: Entry id
+        transactionId:
+          type: string
+          format: uuid
+          description: Transaction that produced this entry
+    PostTransactionRequest:
+      type: object
+      properties:
+        amountCents:
+          type: integer
+          format: int64
+          description: Amount in cents; must be positive.
+          example: 1000
+        fromAccountId:
+          type: string
+          format: uuid
+          description: Account to debit. In the dev profile this id is a funded treasury.
+          example: 00000000-0000-0000-0000-000000000001
+        toAccountId:
+          type: string
+          format: uuid
+          description: Account to credit. Use the id returned by POST /v1/accounts.
+        transactionId:
+          type: string
+          format: uuid
+          description: Client-generated id. Reposting the same id is a no-op.
+          example: 6f1c0a52-3d3e-4c1f-9d4b-2a7f6e0b9a11
+      required:
+      - fromAccountId
+      - toAccountId
+      - transactionId
+    ProblemDetail:
+      type: object
+      properties:
+        detail:
+          type:
+          - string
+          - "null"
+        instance:
+          type:
+          - string
+          - "null"
+          format: uri
+        properties:
+          type:
+          - object
+          - "null"
+          additionalProperties: {}
+        status:
+          type: integer
+          format: int32
+        title:
+          type:
+          - string
+          - "null"
+        type:
+          type: string
+          format: uri

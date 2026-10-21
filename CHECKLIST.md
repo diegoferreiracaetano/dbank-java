@@ -37,7 +37,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: adapter de entrada fino, sem regra de negócio.
 - [x] **M1.9 Testes de integração.** Testcontainers com Postgres cobrindo repositório e fluxo de transferência. Inclui os testes permanentes que no M1.6 e M1.7 foram provados só por testes descartáveis: ida e volta no banco, rollback real, gravação velha rejeitada com `ConcurrentUpdateException` e transferências concorrentes sem perda de atualização.
   - Aprende: teste de integração sem mock de banco, e por que não usar H2 no lugar do Postgres.
-- [ ] **M1.10 Documentação da API.** Contrato OpenAPI completo (título, versão, tags, resumos, descrições, exemplos e os erros `problem+json` de cada operação, corrigindo o `201` do `POST /v1/accounts`), Swagger UI habilitado só no perfil `dev` com exemplos prontos para testar, o contrato versionado em `docs/api/ledger-openapi.yaml` com um teste que reprova se divergir, e um README com o passo a passo para rodar e testar.
+- [x] **M1.10 Documentação da API.** Contrato OpenAPI completo (título, versão, tags, resumos, descrições, exemplos e os erros `problem+json` de cada operação, corrigindo o `201` do `POST /v1/accounts`), Swagger UI habilitado só no perfil `dev` com exemplos prontos para testar, o contrato versionado em `docs/api/ledger-openapi.yaml` com um teste que reprova se divergir, e um README com o passo a passo para rodar e testar.
   - Aprende: contrato como fonte de verdade e como impedir que a documentação envelheça.
 - [ ] **M1.11 ArchUnit.** Regras: `domain` e `application` não dependem de `adapter` nem de Spring.
   - Aprende: como a arquitetura é imposta por teste, e não por convenção.

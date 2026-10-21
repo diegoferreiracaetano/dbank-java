@@ -111,6 +111,12 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.withType<Test>().matching { it.name == "integrationTest" }.configureEach {
+    if (project.hasProperty("updateContract")) {
+        systemProperty("updateContract", "true")
+    }
+}
+
 jacoco {
     toolVersion = libs.versions.jacoco.get()
 }
