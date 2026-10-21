@@ -57,11 +57,16 @@ Detalhados quando o marco anterior fechar. Ver seção 4 da spec.
 
 ## Backlog técnico
 
-Decisões adiadas de propósito, com o gatilho para retomá-las.
+Decisões adiadas de propósito, cada uma com o marco em que volta.
 
-- **`IllegalArgumentException` virando 400.** Trocar por uma exceção de domínio dedicada quando existir um segundo caso além de "transferir para a mesma conta"; hoje qualquer bug que lance esse tipo viraria 400 em vez de 500.
-- **`ApiExceptionHandler` único.** Dividir por assunto (negócio, framework, segurança) quando chegar a segurança (M6) ou passar de uns 8 handlers. Alternativa que escala melhor: exceções de negócio com um `kind` semântico e um único handler.
-- **Paginação do extrato por offset.** Trocar por cursor (`created_at`, `id`) no M6, quando medirmos o custo de páginas profundas.
-- **`save` de `LedgerTransaction` faz `SELECT` antes.** Id atribuído e sem `@Version` leva o Spring Data ao `merge`. Medir no M6 e, se pesar, usar `Persistable` ou `EntityManager.persist`.
-- **Conta `treasury` com saldo finito.** Simplificação de dev, porque `Money` não admite negativo; um ledger real deixa a conta de origem ficar negativa.
-- **Testcontainers fixado em 1.21.4.** O Docker Engine 29 exige API 1.40 ou superior e o Testcontainers 1.21.3, gerenciado pelo Spring Boot 3.5.6, falava a 1.32. Remover o `extra["testcontainers.version"]` quando o BOM do Spring Boot trouxer uma versão compatível.
+| Item | Por que ficou | Volta em |
+|---|---|---|
+| Convention plugin para a configuração de build | com um só módulo não há o que compartilhar; com o segundo serviço a configuração se repete | M2 |
+| `IllegalArgumentException` virando 400 | só um caso hoje (transferir para a mesma conta); qualquer bug que lance esse tipo viraria 400 em vez de 500 | M2, se o `payments` trouxer um segundo caso: criar uma exceção de domínio dedicada |
+| `ApiExceptionHandler` único | quatro handlers da mesma natureza; dividir por assunto, ou mapear por um `kind` semântico | M6 (segurança), ou ao passar de uns 8 handlers |
+| Paginação do extrato por offset | simples e correta; cara em páginas muito profundas | M6, com cursor (`created_at`, `id`) depois de medir |
+| `save` de `LedgerTransaction` faz `SELECT` antes | id atribuído e sem `@Version` leva o Spring Data ao `merge` | M6, medir; se pesar, `Persistable` ou `EntityManager.persist` |
+| Cobertura dos testes de integração fora do JaCoCo | o mínimo mede só `domain` e `application`, que os unitários já cobrem | M4, junto com o CI |
+| Lint do contrato (Spectral) e publicação estática da documentação | dependem do CI | M4 |
+| Conta `treasury` com saldo finito | simplificação de dev: `Money` não admite negativo, e um ledger real deixa a conta de origem ficar negativa | permanente, só no perfil `dev` |
+| Testcontainers fixado em 1.21.4 | o Docker Engine 29 exige API 1.40 ou superior, e a 1.21.3 do BOM do Spring Boot 3.5.6 falava a 1.32 | remover o `extra["testcontainers.version"]` quando o BOM trouxer versão compatível |

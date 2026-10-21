@@ -16,7 +16,7 @@ Projeto em Java 21, Spring Boot, Postgres, Kafka e Redis, construído passo a pa
 | Marco | Entrega | Situação |
 |---|---|---|
 | M0 | Setup de qualidade (lint, cobertura, análise estática) | feito |
-| M1 | `dbank-ledger`: domínio, persistência, REST, testes de integração | em andamento |
+| M1 | `dbank-ledger`: domínio, persistência, REST, documentação, testes de integração e de arquitetura | feito |
 | M2 a M9 | `dbank-payments`, Kafka, CI, observabilidade, resiliência, Kubernetes | planejado |
 
 Hoje existe apenas o `dbank-ledger`.
@@ -52,7 +52,7 @@ O Swagger UI fica em `http://localhost:8081/swagger-ui.html`. O passo a passo pa
 
 | Comando | O que roda |
 |---|---|
-| `./gradlew test` | testes unitários, rápidos e sem Docker |
+| `./gradlew test` | testes unitários e regras de arquitetura (ArchUnit), rápidos e sem Docker |
 | `./gradlew integrationTest` | testes de integração contra um Postgres real (Testcontainers, exige Docker) |
 | `./gradlew check` | tudo: formatação, Checkstyle, SpotBugs, testes e cobertura mínima |
 | `./gradlew spotlessApply` | corrige a formatação |

@@ -127,3 +127,16 @@ O foco do projeto é o Diego aprender; o código é construído em conjunto, nã
 - Linguagem Java (a vaga pede Java), diferente do DBook em Kotlin.
 - Cloud AWS apenas como infraestrutura como código; não há deploy real obrigatório.
 - Repositório novo `dbank/`, com git próprio.
+
+## 7. Decisões tomadas no M1
+
+O que o `dbank-ledger` ensinou e que a spec original não previa.
+
+- **Tabelas do ledger:** `account`, `ledger_transaction` e `ledger_entry`. A `ledger_transaction` existe para que a chave primária única feche a corrida da idempotência. `outbox_event` e `processed_event` entram no M3.
+- **Locking otimista:** `Account` carrega uma `version` anulável (`null` significa "ainda não gravada"), mapeada com `@Version`, e a coluna entrou pela `V2` do Flyway, sem editar a `V1`.
+- **Transação como porta:** a `application` pede `TransactionRunner` e o `SpringTransactionRunner` traduz `OptimisticLockingFailureException` em `ConcurrentUpdateException`. Quem repete a operação é o chamador, e a repetição relê os dados.
+- **Defesa em profundidade:** o domínio valida e o banco repete as regras em constraints (`CHECK`, chaves estrangeiras e chave primária).
+- **Domínio por responsabilidade:** `shared`, `account` e `ledger`, com dependências no sentido ledger, account, shared. O ArchUnit impõe a regra com uma lista de permitidos para `domain` e `application`.
+- **API REST de apoio:** erros em `problem+json` (404 conta inexistente, 409 conflito de versão, 422 saldo insuficiente, 400 pedido inválido). O contrato OpenAPI vive nas interfaces `AccountApi` e `TransactionApi`, as restrições do Bean Validation ficam nelas (um método que implementa não pode redeclará-las), e o arquivo `docs/api/ledger-openapi.yaml` é versionado e protegido por um teste de deriva.
+- **Perfil `dev`:** habilita o Swagger UI e cria a conta `treasury` por uma migração repetível, para financiar contas por lançamentos reais.
+- **Testes:** unitários com fakes; integração com um Postgres 16 compartilhado via Testcontainers; arquitetura com ArchUnit. O `check` passa a exigir Docker.

@@ -47,6 +47,12 @@ config/        ligação dos beans
 
 O banco é versionado pelo Flyway em `src/main/resources/db/migration`. O perfil `dev` acrescenta `db/dev`, que cria a conta `treasury`.
 
+## Testes
+
+- **Unitários** (`src/test`): domínio, casos de uso com fakes em memória, mappers e controllers com `@WebMvcTest`.
+- **Arquitetura** (`src/test`, ArchUnit): `domain` e `application` só dependem de si mesmos e do JDK, os adapters não se conhecem nem são públicos, e `@Entity` e controllers ficam nos seus adapters.
+- **Integração** (`src/integrationTest`): Postgres 16 real via Testcontainers, cobrindo constraints, locking otimista, rollback, extrato, idempotência, transferências concorrentes, o fluxo HTTP e o contrato da API.
+
 ## Contrato da API
 
 O arquivo `docs/api/ledger-openapi.yaml` é versionado e um teste de integração reprova o build se a API mudar sem ele. Para atualizá-lo depois de uma mudança intencional:
