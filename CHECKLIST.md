@@ -39,7 +39,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: teste de integração sem mock de banco, e por que não usar H2 no lugar do Postgres.
 - [x] **M1.10 Documentação da API.** Contrato OpenAPI completo (título, versão, tags, resumos, descrições, exemplos e os erros `problem+json` de cada operação, corrigindo o `201` do `POST /v1/accounts`), Swagger UI habilitado só no perfil `dev` com exemplos prontos para testar, o contrato versionado em `docs/api/ledger-openapi.yaml` com um teste que reprova se divergir, e um README com o passo a passo para rodar e testar.
   - Aprende: contrato como fonte de verdade e como impedir que a documentação envelheça.
-- [ ] **M1.11 ArchUnit.** Regras: `domain` e `application` não dependem de `adapter` nem de Spring.
+- [x] **M1.11 ArchUnit.** Regras: `domain` e `application` não dependem de `adapter` nem de Spring.
   - Aprende: como a arquitetura é imposta por teste, e não por convenção.
 - [ ] **M1.12 Fechamento.** Rodar a suíte completa, revisar o README do serviço e responder as perguntas de entrevista abaixo.
 
