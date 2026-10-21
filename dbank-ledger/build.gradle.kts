@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.spotless)
 }
 
+extra["testcontainers.version"] = libs.versions.testcontainers.get()
+
 group = "com.diegoferreiracaetano.dbank"
 version = "0.0.1-SNAPSHOT"
 
@@ -70,12 +72,18 @@ tasks.named("spotbugsTest") {
     enabled = false
 }
 
+tasks.matching { it.name == "spotbugsIntegrationTest" }.configureEach {
+    enabled = false
+}
+
 testing {
     suites {
         register<JvmTestSuite>("integrationTest") {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
+                implementation("org.springframework.boot:spring-boot-testcontainers")
+                implementation("org.testcontainers:postgresql")
             }
             targets {
                 all {

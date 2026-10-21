@@ -8,6 +8,7 @@ jacoco = "0.8.15"
 spotbugs-tool = "4.10.5"
 commons-lang3 = "3.21.0"
 springdoc = "2.8.17"
+testcontainers = "1.21.4"
 
 [libraries]
 springdoc-openapi-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }

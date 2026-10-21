@@ -35,7 +35,7 @@ Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em p
   - Aprende: otimista vs pessimista, e o que acontece sob corrida.
 - [x] **M1.8 Adapter REST de apoio.** Criar conta, consultar saldo e extrato, com OpenAPI e erros em `problem+json`. Serve para exercitar o serviço até o Kafka entrar no M3.
   - Aprende: adapter de entrada fino, sem regra de negócio.
-- [ ] **M1.9 Testes de integração.** Testcontainers com Postgres cobrindo repositório e fluxo de transferência. Inclui os testes permanentes que no M1.6 e M1.7 foram provados só por testes descartáveis: ida e volta no banco, rollback real, gravação velha rejeitada com `ConcurrentUpdateException` e transferências concorrentes sem perda de atualização.
+- [x] **M1.9 Testes de integração.** Testcontainers com Postgres cobrindo repositório e fluxo de transferência. Inclui os testes permanentes que no M1.6 e M1.7 foram provados só por testes descartáveis: ida e volta no banco, rollback real, gravação velha rejeitada com `ConcurrentUpdateException` e transferências concorrentes sem perda de atualização.
   - Aprende: teste de integração sem mock de banco, e por que não usar H2 no lugar do Postgres.
 - [ ] **M1.10 Documentação da API.** Contrato OpenAPI completo (título, versão, tags, resumos, descrições, exemplos e os erros `problem+json` de cada operação, corrigindo o `201` do `POST /v1/accounts`), Swagger UI habilitado só no perfil `dev` com exemplos prontos para testar, o contrato versionado em `docs/api/ledger-openapi.yaml` com um teste que reprova se divergir, e um README com o passo a passo para rodar e testar.
   - Aprende: contrato como fonte de verdade e como impedir que a documentação envelheça.
@@ -64,3 +64,4 @@ Decisões adiadas de propósito, com o gatilho para retomá-las.
 - **Paginação do extrato por offset.** Trocar por cursor (`created_at`, `id`) no M6, quando medirmos o custo de páginas profundas.
 - **`save` de `LedgerTransaction` faz `SELECT` antes.** Id atribuído e sem `@Version` leva o Spring Data ao `merge`. Medir no M6 e, se pesar, usar `Persistable` ou `EntityManager.persist`.
 - **Conta `treasury` com saldo finito.** Simplificação de dev, porque `Money` não admite negativo; um ledger real deixa a conta de origem ficar negativa.
+- **Testcontainers fixado em 1.21.4.** O Docker Engine 29 exige API 1.40 ou superior e o Testcontainers 1.21.3, gerenciado pelo Spring Boot 3.5.6, falava a 1.32. Remover o `extra["testcontainers.version"]` quando o BOM do Spring Boot trouxer uma versão compatível.
