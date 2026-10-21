@@ -2,6 +2,19 @@
 
 Um item por vez. Marcar `[x]` só depois que o Diego testou e confirmou. Spec: `docs/superpowers/specs/2026-10-20-dbank-design.md`.
 
+## M0 — Setup de qualidade
+
+Meta: um único comando, `./gradlew check`, que o CI vai chamar sem lógica própria. Configuração direto no módulo; vira convention plugin quando o `dbank-payments` entrar (M2).
+
+- [x] **M0.1 Catálogo de versões.** `gradle/libs.versions.toml` com plugins, ferramentas e versões.
+  - Aprende: version catalog é recurso do Gradle (o Android o adotou), com uma fonte única de versões.
+- [x] **M0.2 Compilador estrito.** `-Xlint:all -Werror`. Já achou o `serialVersionUID` que faltava na exceção.
+- [x] **M0.3 Spotless (Palantir).** Formatação verificada no `check`; `spotlessApply` corrige.
+- [x] **M0.4 Checkstyle e SpotBugs.** Regras enxutas em `config/checkstyle/`; SpotBugs com relatório HTML e XML.
+  - Aprende: SpotBugs analisa bytecode e cobre a falta de null-safety do Java.
+- [x] **M0.5 JaCoCo.** Mínimo de 80% de linhas e 70% de branches em `domain` e `application`.
+- [x] **M0.6 `integrationTest` separado.** Equivalente ao `androidTest`, com containers no lugar do emulador. Ainda sem testes (entram no M1.9).
+
 ## M1 — `dbank-ledger` sozinho
 
 Meta: um serviço Hexagonal que guarda contas e lança débitos e créditos em partida dobrada, com saldo seguro sob concorrência. Sem Kafka e sem `payments` ainda.
