@@ -17,6 +17,11 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
+springdoc:
+  swagger-ui:
+    enabled: false
+  writer-with-order-by-keys: true
+
 dbank:
   idempotency:
     cache:

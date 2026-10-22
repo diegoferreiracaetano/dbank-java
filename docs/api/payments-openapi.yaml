@@ -1,0 +1,207 @@
+openapi: 3.1.0
+info:
+  description: |
+    Transfer requests, accepted for asynchronous processing and idempotent by key.
+    Amounts are integers in cents. Errors follow RFC 9457 (application/problem+json).
+  title: Dbank Payments API
+  version: 1.0.0
+servers:
+- description: Local development
+  url: http://localhost:8082
+tags:
+- description: Request and read transfers
+  name: Transfers
+paths:
+  /v1/transfers:
+    post:
+      description: "Accepts a transfer for asynchronous processing. Idempotent by\
+        \ the Idempotency-Key header: repeating the same key with the same body returns\
+        \ the original transfer."
+      operationId: request
+      parameters:
+      - description: Client-generated key (up to 255 characters). Reuse it on retries
+          of the same intention.
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestTransferRequest"
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransferResponse"
+          description: Accepted; the transfer is PENDING until the ledger answers
+          headers:
+            Idempotency-Replayed:
+              description: true when this response replays a previous request
+              schema:
+                type: boolean
+              style: simple
+            Location:
+              description: Path of the transfer
+              schema:
+                type: string
+              style: simple
+        "400":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:invalid-request
+                title: Invalid request
+                status: 400
+                detail: Cannot transfer to the same account
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: The request is malformed or breaks a validation rule
+        "422":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:idempotency-key-reuse
+                title: Idempotency key reuse
+                status: 422
+                detail: "Idempotency key already used with a different request: 7d1c"
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: The Idempotency-Key was already used with a different request
+      summary: Request a transfer
+      tags:
+      - Transfers
+  /v1/transfers/{id}:
+    get:
+      description: Returns the current state of the transfer.
+      operationId: get
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransferResponse"
+          description: The transfer
+        "400":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:invalid-request
+                title: Invalid request
+                status: 400
+                detail: Cannot transfer to the same account
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: The request is malformed or breaks a validation rule
+        "404":
+          content:
+            application/problem+json:
+              example:
+                type: urn:dbank:problem:transfer-not-found
+                title: Transfer not found
+                status: 404
+                detail: "Transfer not found: 6f1c0a52-3d3e-4c1f-9d4b-2a7f6e0b9a11"
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+          description: The transfer does not exist
+      summary: Get a transfer
+      tags:
+      - Transfers
+components:
+  schemas:
+    ProblemDetail:
+      type: object
+      properties:
+        detail:
+          type:
+          - string
+          - "null"
+        instance:
+          type:
+          - string
+          - "null"
+          format: uri
+        properties:
+          type:
+          - object
+          - "null"
+          additionalProperties: {}
+        status:
+          type: integer
+          format: int32
+        title:
+          type:
+          - string
+          - "null"
+        type:
+          type: string
+          format: uri
+    RequestTransferRequest:
+      type: object
+      properties:
+        amountCents:
+          type: integer
+          format: int64
+          description: Amount in cents; must be positive
+          example: 1000
+        fromAccountId:
+          type: string
+          format: uuid
+          description: Account to debit
+          example: 6f1c0a52-3d3e-4c1f-9d4b-2a7f6e0b9a11
+        toAccountId:
+          type: string
+          format: uuid
+          description: Account to credit
+          example: 0b8e5b7a-9c1d-4e0a-8f3a-5d2c7e1b4a90
+      required:
+      - fromAccountId
+      - toAccountId
+    TransferResponse:
+      type: object
+      properties:
+        amountCents:
+          type: integer
+          format: int64
+          description: Amount in cents
+          example: 1000
+        createdAt:
+          type: string
+          format: date-time
+          description: When the transfer was requested (UTC)
+          example: 2026-01-01T00:00:00Z
+        failureReason:
+          type:
+          - string
+          - "null"
+          description: Present only when the transfer failed
+        fromAccountId:
+          type: string
+          format: uuid
+          description: Account debited
+        id:
+          type: string
+          format: uuid
+          description: Transfer id
+        status:
+          type: string
+          description: PENDING until the ledger answers
+          enum:
+          - PENDING
+          - COMPLETED
+          - FAILED
+        toAccountId:
+          type: string
+          format: uuid
+          description: Account credited

@@ -8,6 +8,8 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import jakarta.persistence.Entity;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @AnalyzeClasses(
         packages = "com.diegoferreiracaetano.dbank.payments",
@@ -103,6 +105,31 @@ class ArchitectureTest {
                 .dependOnClassesThat()
                 .resideInAnyPackage("java.sql..", "javax.sql..", "org.springframework.jdbc..")
                 .because("data access goes through Spring Data JPA, and native SQL is declared with @Query")
+                .check(classes);
+    }
+
+    @ArchTest
+    void givenInboundAdapters_whenCheckingDependencies_thenShouldNotKnowOutboundAdapters(JavaClasses classes) {
+        noClasses()
+                .that()
+                .resideInAPackage("..adapter.in..")
+                .should()
+                .dependOnClassesThat()
+                .resideInAPackage("..adapter.out..")
+                .because("adapters talk to each other only through ports")
+                .check(classes);
+    }
+
+    @ArchTest
+    void givenRestComponents_whenCheckingLocation_thenShouldLiveInTheRestAdapter(JavaClasses classes) {
+        classes()
+                .that()
+                .areAnnotatedWith(RestController.class)
+                .or()
+                .areAnnotatedWith(RestControllerAdvice.class)
+                .should()
+                .resideInAPackage("..adapter.in.rest..")
+                .because("HTTP is an adapter concern")
                 .check(classes);
     }
 }
