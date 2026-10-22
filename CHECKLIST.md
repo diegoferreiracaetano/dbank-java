@@ -66,7 +66,7 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
   - Aprende: cache como otimização e o banco como fonte da verdade.
 - [x] **M2.7 Adapter REST.** `POST /v1/transfers` (202), `GET /v1/transfers/{id}` e `problem+json`.
 - [x] **M2.8 Testes de resiliência do cache.** Os testes de integração com Postgres e Redis e as regras de arquitetura do `payments` já entraram nos itens M2.5 a M2.7. Faltam duas provas de ponta a ponta: o pedido continua funcionando com o Redis falhando, e a chave expirada no Redis volta a ser respondida pelo banco.
-- [ ] **M2.9 Documentação.** OpenAPI versionado, README do serviço e README da raiz.
+- [x] **M2.9 Documentação.** OpenAPI versionado, README do serviço e README da raiz.
 - [ ] **M2.10 Fechamento.** Clone limpo e perguntas de entrevista do M2.
 
 ## M3 a M9
@@ -79,7 +79,6 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 
 | Item | Por que ficou | Volta em |
 |---|---|---|
-| Convention plugin para a configuração de build | com um só módulo não há o que compartilhar; com o segundo serviço a configuração se repete | M2 |
 | `IllegalArgumentException` virando 400 | só um caso hoje (transferir para a mesma conta); qualquer bug que lance esse tipo viraria 400 em vez de 500 | M2, se o `payments` trouxer um segundo caso: criar uma exceção de domínio dedicada |
 | `ApiExceptionHandler` único | quatro handlers da mesma natureza; dividir por assunto, ou mapear por um `kind` semântico | M6 (segurança), ou ao passar de uns 8 handlers |
 | Paginação do extrato por offset | simples e correta; cara em páginas muito profundas | M6, com cursor (`created_at`, `id`) depois de medir |
@@ -90,3 +89,6 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Testcontainers fixado em 1.21.4 | o Docker Engine 29 exige API 1.40 ou superior, e a 1.21.3 do BOM do Spring Boot 3.5.6 falava a 1.32 | remover o `extra["testcontainers.version"]` quando o BOM trouxer versão compatível |
 | Limpeza das chaves de idempotência expiradas no Postgres | as chaves não expiram no banco, e só o cache (M2.6) terá prazo | M5 ou M6, com um job agendado que apague o que passou do prazo de retenção |
 | Chave de idempotência global | sem autenticação, dois clientes que escolhessem a mesma chave colidiriam | M6: passa a valer por cliente |
+| Popular o cache já na reserva nova | exigiria gravar depois do commit, com um gancho de transação, por um ganho pequeno | M5, se a medição pedir |
+| `version` na `Transfer` | duas transições contraditórias quase simultâneas deixariam a última escrita vencer em silêncio | M3, quando os eventos chegarem |
+| Módulo só de suporte a testes (containers, regras de arquitetura) | duplicado entre dois serviços; a regra dos três manda esperar o terceiro | M4, com o `notifications` |

@@ -140,3 +140,13 @@ O que o `dbank-ledger` ensinou e que a spec original não previa.
 - **API REST de apoio:** erros em `problem+json` (404 conta inexistente, 409 conflito de versão, 422 saldo insuficiente, 400 pedido inválido). O contrato OpenAPI vive nas interfaces `AccountApi` e `TransactionApi`, as restrições do Bean Validation ficam nelas (um método que implementa não pode redeclará-las), e o arquivo `docs/api/ledger-openapi.yaml` é versionado e protegido por um teste de deriva.
 - **Perfil `dev`:** habilita o Swagger UI e cria a conta `treasury` por uma migração repetível, para financiar contas por lançamentos reais.
 - **Testes:** unitários com fakes; integração com um Postgres 16 compartilhado via Testcontainers; arquitetura com ArchUnit. O `check` passa a exigir Docker.
+
+## 8. Decisões tomadas no M2
+
+- **Build compartilhado:** a configuração de qualidade, testes e Spring Boot vive no plugin `dbank.spring-service`, em um `build-logic`. Os serviços compartilham configuração de build, nunca código de produção.
+- **`Transfer`:** máquina de estados imutável. Repetir o mesmo resultado é inofensivo, e um resultado contraditório é erro. O motivo da falha é tipado. Ainda sem `version`, a decidir no M3.
+- **Idempotência:** a chave identifica o pedido, e não o conteúdo. A reserva é atômica, com `INSERT ... ON CONFLICT DO NOTHING` declarado como consulta nativa no repositório JPA, e devolve um resultado selado (`Claimed` ou `Existing`). A assinatura vem dos campos do pedido, a validação vem antes da reserva, e reserva e gravação ficam na mesma transação, com a chave estrangeira adiada.
+- **Redis:** cache de registros imutáveis, sem invalidação. Só entra o que o banco confirmou, e qualquer falha do Redis cai para o banco. Um decorador `@Primary` fica na frente do adaptador do banco.
+- **REST:** `202 Accepted`, e a repetição devolve o mesmo status com o cabeçalho `Idempotency-Replayed`. A mesma chave com outro pedido é 422.
+- **Padrão de dados:** acesso só por Spring Data JPA, imposto por ArchUnit nos dois serviços.
+- **Bancos:** um por serviço, no mesmo Postgres em desenvolvimento.
