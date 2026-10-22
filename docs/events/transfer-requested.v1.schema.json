@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TransferRequested v1",
+  "description": "Published by payments when a transfer is accepted. Topic: payments.transfer-requested.v1. Key: fromAccountId.",
+  "type": "object",
+  "required": ["eventId", "eventType", "occurredAt", "payload"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "const": "TransferRequested" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "payload": {
+      "type": "object",
+      "required": ["transferId", "fromAccountId", "toAccountId", "amountCents"],
+      "properties": {
+        "transferId": { "type": "string", "format": "uuid" },
+        "fromAccountId": { "type": "string", "format": "uuid" },
+        "toAccountId": { "type": "string", "format": "uuid" },
+        "amountCents": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

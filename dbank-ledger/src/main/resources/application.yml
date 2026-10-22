@@ -10,6 +10,13 @@ spring:
     password: dbank
   flyway:
     ignore-migration-patterns: "repeatable:missing"
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: dbank-ledger
+      auto-offset-reset: earliest
+    producer:
+      acks: all
   jpa:
     hibernate:
       ddl-auto: validate

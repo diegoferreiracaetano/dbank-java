@@ -73,7 +73,7 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
 
 Meta: a transferência pedida no `payments` é executada no `ledger` e o resultado volta, de forma assíncrona, sem perder nem duplicar nada, mesmo com mensagens repetidas e falhas no meio. Entrega "pelo menos uma vez", com outbox e consumidores idempotentes.
 
-- [ ] **M3.1 Kafka no ambiente e contratos dos eventos.** Kafka no compose, tópicos, `spring-kafka` nos dois serviços, Testcontainers com Kafka, os esquemas dos eventos em `docs/events` e um teste de ida e volta em cada serviço.
+- [x] **M3.1 Kafka no ambiente e contratos dos eventos.** Kafka no compose, tópicos, `spring-kafka` nos dois serviços, Testcontainers com Kafka, os esquemas dos eventos em `docs/events` e um teste de ida e volta em cada serviço.
   - Aprende: tópico, partição, chave, grupo de consumidores e entrega "pelo menos uma vez".
 - [ ] **M3.2 Outbox no `payments`.** Tabela de eventos gravada na mesma transação da transferência e um publicador que envia ao Kafka e marca como enviado.
   - Aprende: por que gravar no banco e publicar depois, em vez de publicar direto.
@@ -108,3 +108,4 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | `version` na `Transfer` | duas transições contraditórias quase simultâneas deixariam a última escrita vencer em silêncio | M3, quando os eventos chegarem |
 | Módulo só de suporte a testes (containers, regras de arquitetura) | duplicado entre dois serviços; a regra dos três manda esperar o terceiro | M4, com o `notifications` |
 | Health agregando o Redis | um Redis fora aparece como `DOWN` mesmo com o serviço funcionando degradado, e separar liveness de readiness é trabalho de observabilidade | M5 ou M8 |
+| Kafka fixado em `apache/kafka:3.8.0` | a 3.9.0 recusa o `0.0.0.0` em `advertised.listeners` que o Testcontainers injeta | subir de versão quando o Testcontainers corrigir |

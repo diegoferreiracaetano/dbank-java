@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TransferResult v1",
+  "description": "Published by ledger when a transfer is settled or rejected. Topic: ledger.transfer-result.v1. Key: fromAccountId.",
+  "type": "object",
+  "required": ["eventId", "eventType", "occurredAt", "payload"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "enum": ["TransferSettled", "TransferRejected"] },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "payload": {
+      "type": "object",
+      "required": ["transferId", "fromAccountId"],
+      "properties": {
+        "transferId": { "type": "string", "format": "uuid" },
+        "fromAccountId": { "type": "string", "format": "uuid" },
+        "reason": { "enum": ["INSUFFICIENT_FUNDS", "ACCOUNT_NOT_FOUND"] }
+      }
+    }
+  }
+}

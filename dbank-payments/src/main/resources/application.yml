@@ -12,6 +12,13 @@ spring:
     redis:
       host: localhost
       port: 6379
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: dbank-payments
+      auto-offset-reset: earliest
+    producer:
+      acks: all
   jpa:
     hibernate:
       ddl-auto: validate

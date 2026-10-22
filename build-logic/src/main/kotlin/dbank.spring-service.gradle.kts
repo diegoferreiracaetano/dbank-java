@@ -79,6 +79,7 @@ testing {
                 implementation(project())
                 implementation("org.springframework.boot:spring-boot-testcontainers")
                 implementation("org.testcontainers:postgresql")
+                implementation("org.testcontainers:kafka")
             }
             targets {
                 all {
