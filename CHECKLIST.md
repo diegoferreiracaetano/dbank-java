@@ -69,7 +69,22 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
 - [x] **M2.9 Documentação.** OpenAPI versionado, README do serviço e README da raiz.
 - [x] **M2.10 Fechamento.** Clone limpo e perguntas de entrevista do M2.
 
-## M3 a M9
+## M3 — `payments` e `ledger` conversando por Kafka
+
+Meta: a transferência pedida no `payments` é executada no `ledger` e o resultado volta, de forma assíncrona, sem perder nem duplicar nada, mesmo com mensagens repetidas e falhas no meio. Entrega "pelo menos uma vez", com outbox e consumidores idempotentes.
+
+- [ ] **M3.1 Kafka no ambiente e contratos dos eventos.** Kafka no compose, tópicos, `spring-kafka` nos dois serviços, Testcontainers com Kafka, os esquemas dos eventos em `docs/events` e um teste de ida e volta em cada serviço.
+  - Aprende: tópico, partição, chave, grupo de consumidores e entrega "pelo menos uma vez".
+- [ ] **M3.2 Outbox no `payments`.** Tabela de eventos gravada na mesma transação da transferência e um publicador que envia ao Kafka e marca como enviado.
+  - Aprende: por que gravar no banco e publicar depois, em vez de publicar direto.
+- [ ] **M3.3 Consumidor no `ledger`.** Consome o pedido, executa a transferência (já idempotente) e traduz as falhas de negócio em resultado.
+- [ ] **M3.4 Outbox no `ledger` e resultado da transferência.** O resultado (concluída ou recusada) é gravado na mesma transação do lançamento e publicado.
+- [ ] **M3.5 Consumidor no `payments`.** Aplica o resultado na `Transfer` com as transições idempotentes e decide se ela precisa de `version`.
+- [ ] **M3.6 Retentativa com espera crescente e fila de mensagens mortas.** Falha transitória tenta de novo; mensagem impossível vai para a DLQ.
+- [ ] **M3.7 Ponta a ponta e documentação.** Uma transferência pedida no `payments` termina `COMPLETED` ou `FAILED`, e os READMEs e a spec passam a descrever o fluxo.
+- [ ] **M3.8 Fechamento.** Clone limpo e arrumação dos documentos.
+
+## M4 a M9
 
 Detalhados quando o marco anterior fechar. Ver seção 4 da spec.
 
