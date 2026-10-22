@@ -67,7 +67,7 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
 - [x] **M2.7 Adapter REST.** `POST /v1/transfers` (202), `GET /v1/transfers/{id}` e `problem+json`.
 - [x] **M2.8 Testes de resiliência do cache.** Os testes de integração com Postgres e Redis e as regras de arquitetura do `payments` já entraram nos itens M2.5 a M2.7. Faltam duas provas de ponta a ponta: o pedido continua funcionando com o Redis falhando, e a chave expirada no Redis volta a ser respondida pelo banco.
 - [x] **M2.9 Documentação.** OpenAPI versionado, README do serviço e README da raiz.
-- [ ] **M2.10 Fechamento.** Clone limpo e perguntas de entrevista do M2.
+- [x] **M2.10 Fechamento.** Clone limpo e perguntas de entrevista do M2.
 
 ## M3 a M9
 
@@ -92,3 +92,4 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Popular o cache já na reserva nova | exigiria gravar depois do commit, com um gancho de transação, por um ganho pequeno | M5, se a medição pedir |
 | `version` na `Transfer` | duas transições contraditórias quase simultâneas deixariam a última escrita vencer em silêncio | M3, quando os eventos chegarem |
 | Módulo só de suporte a testes (containers, regras de arquitetura) | duplicado entre dois serviços; a regra dos três manda esperar o terceiro | M4, com o `notifications` |
+| Health agregando o Redis | um Redis fora aparece como `DOWN` mesmo com o serviço funcionando degradado, e separar liveness de readiness é trabalho de observabilidade | M5 ou M8 |

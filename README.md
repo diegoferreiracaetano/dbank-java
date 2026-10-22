@@ -27,7 +27,7 @@ Impostos por teste (ArchUnit), então um desvio reprova o build:
 |---|---|---|
 | M0 | Setup de qualidade (lint, cobertura, análise estática) | feito |
 | M1 | `dbank-ledger`: domínio, persistência, REST, documentação, testes de integração e de arquitetura | feito |
-| M2 | `dbank-payments`: domínio, idempotência com Redis, persistência, REST e testes | em andamento (M2.1 a M2.8 feitos) |
+| M2 | `dbank-payments`: domínio, idempotência com Redis, persistência, REST e testes | feito |
 | M3 a M9 | Kafka, CI, observabilidade, resiliência, Kubernetes | planejado |
 
 Existem o `dbank-ledger` e o `dbank-payments`. Ainda não conversam entre si: a ligação por Kafka é o M3.
@@ -86,4 +86,4 @@ Suba cada serviço no perfil `dev`, em terminais separados. O perfil `dev` habil
 - Contratos das APIs: [`ledger`](docs/api/ledger-openapi.yaml) e [`payments`](docs/api/payments-openapi.yaml)
 - Desenho e decisões: [spec](docs/superpowers/specs/2026-10-20-dbank-design.md)
 - Plano e pendências técnicas: [CHECKLIST.md](CHECKLIST.md)
-- Roteiro de estudo para entrevista: [docs/interview/m1-ledger.md](docs/interview/m1-ledger.md)
+- Roteiros de estudo para entrevista: [M1](docs/interview/m1-ledger.md) e [M2](docs/interview/m2-payments.md)
