@@ -61,11 +61,11 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
 - [x] **M2.3 Domínio.** `Transfer` com máquina de estados (`PENDING` para `COMPLETED` ou `FAILED`), `Money` e ids próprios.
   - Aprende: por que cada serviço tem seu próprio `Money` em vez de uma biblioteca compartilhada.
 - [x] **M2.4 Casos de uso e portas.** Solicitar e consultar transferência, portas de repositório e de idempotência, fakes.
-- [ ] **M2.5 Flyway e adapter JPA.** `transfer` e `idempotency_key` com unicidade.
+- [x] **M2.5 Flyway e adapter JPA.** `transfer` e `idempotency_key` com unicidade.
 - [ ] **M2.6 Idempotência com Redis.** `Idempotency-Key` com `SET NX` e TTL como caminho rápido, constraint única no Postgres como garantia final, e detecção de reuso da chave com corpo diferente.
   - Aprende: cache como otimização e o banco como fonte da verdade.
 - [ ] **M2.7 Adapter REST.** `POST /v1/transfers` (202), `GET /v1/transfers/{id}` e `problem+json`.
-- [ ] **M2.8 Testes de integração e ArchUnit.** Postgres e Redis via Testcontainers e as regras de arquitetura do `payments`.
+- [ ] **M2.8 Testes de integração e ArchUnit.** Postgres e Redis via Testcontainers e as regras de arquitetura do `payments`. As regras principais de ArchUnit e a de acesso a dados só por JPA já entraram no M2.5; faltam as do REST, que chegam junto com o adaptador no M2.7.
 - [ ] **M2.9 Documentação.** OpenAPI versionado, README do serviço e README da raiz.
 - [ ] **M2.10 Fechamento.** Clone limpo e perguntas de entrevista do M2.
 
@@ -88,3 +88,5 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Lint do contrato (Spectral) e publicação estática da documentação | dependem do CI | M4 |
 | Conta `treasury` com saldo finito | simplificação de dev: `Money` não admite negativo, e um ledger real deixa a conta de origem ficar negativa | permanente, só no perfil `dev` |
 | Testcontainers fixado em 1.21.4 | o Docker Engine 29 exige API 1.40 ou superior, e a 1.21.3 do BOM do Spring Boot 3.5.6 falava a 1.32 | remover o `extra["testcontainers.version"]` quando o BOM trouxer versão compatível |
+| Limpeza das chaves de idempotência expiradas no Postgres | as chaves não expiram no banco, e só o cache (M2.6) terá prazo | M5 ou M6, com um job agendado que apague o que passou do prazo de retenção |
+| Chave de idempotência global | sem autenticação, dois clientes que escolhessem a mesma chave colidiriam | M6: passa a valer por cliente |

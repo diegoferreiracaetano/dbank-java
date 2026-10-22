@@ -134,4 +134,14 @@ class ArchitectureTest {
                 .because("HTTP is an adapter concern")
                 .check(classes);
     }
+
+    @ArchTest
+    void givenProductionCode_whenCheckingDataAccess_thenShouldNotUseJdbcDirectly(JavaClasses classes) {
+        noClasses()
+                .should()
+                .dependOnClassesThat()
+                .resideInAnyPackage("java.sql..", "javax.sql..", "org.springframework.jdbc..")
+                .because("data access goes through Spring Data JPA, and native SQL is declared with @Query")
+                .check(classes);
+    }
 }

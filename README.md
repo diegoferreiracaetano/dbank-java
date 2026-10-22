@@ -11,6 +11,15 @@ Projeto em Java 21, Spring Boot, Postgres, Kafka e Redis, construído passo a pa
 - **Sem atualização perdida.** Locking otimista por versão: duas operações concorrentes na mesma conta nunca se sobrescrevem.
 - **Tudo ou nada.** Um erro no meio desfaz a transferência inteira.
 
+## Padrões do projeto
+
+Impostos por teste (ArchUnit), então um desvio reprova o build:
+
+- **Hexagonal.** `domain` e `application` só dependem de si mesmos e do JDK; os adapters não são públicos nem se conhecem; `@Entity` e controllers ficam nos seus adapters.
+- **Acesso a dados só por Spring Data JPA.** SQL nativo existe, mas declarado com `@Query` dentro do repositório; JDBC direto (`JdbcTemplate`, `JdbcClient`, `java.sql`) é proibido em código de produção.
+- **Serviços não compartilham código**, só contratos (REST e eventos).
+- **Testes** no padrão `given/when/then`: unitários sem Docker e de integração contra um Postgres real.
+
 ## Status
 
 | Marco | Entrega | Situação |
