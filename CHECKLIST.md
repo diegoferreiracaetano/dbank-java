@@ -65,7 +65,7 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
 - [x] **M2.6 Idempotência com Redis.** `Idempotency-Key` com `SET NX` e TTL como caminho rápido, constraint única no Postgres como garantia final, e detecção de reuso da chave com corpo diferente.
   - Aprende: cache como otimização e o banco como fonte da verdade.
 - [x] **M2.7 Adapter REST.** `POST /v1/transfers` (202), `GET /v1/transfers/{id}` e `problem+json`.
-- [ ] **M2.8 Testes de resiliência do cache.** Os testes de integração com Postgres e Redis e as regras de arquitetura do `payments` já entraram nos itens M2.5 a M2.7. Faltam duas provas de ponta a ponta: o pedido continua funcionando com o Redis falhando, e a chave expirada no Redis volta a ser respondida pelo banco.
+- [x] **M2.8 Testes de resiliência do cache.** Os testes de integração com Postgres e Redis e as regras de arquitetura do `payments` já entraram nos itens M2.5 a M2.7. Faltam duas provas de ponta a ponta: o pedido continua funcionando com o Redis falhando, e a chave expirada no Redis volta a ser respondida pelo banco.
 - [ ] **M2.9 Documentação.** OpenAPI versionado, README do serviço e README da raiz.
 - [ ] **M2.10 Fechamento.** Clone limpo e perguntas de entrevista do M2.
 
