@@ -17,6 +17,11 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
+dbank:
+  idempotency:
+    cache:
+      ttl: 24h
+
 management:
   endpoints:
     web:

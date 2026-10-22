@@ -8,7 +8,7 @@ import com.diegoferreiracaetano.dbank.payments.application.port.out.IdempotencyS
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.TransferId;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("databaseIdempotencyStore")
 class IdempotencyStoreAdapter implements IdempotencyStore {
 
     private final SpringDataIdempotencyKeyRepository repository;

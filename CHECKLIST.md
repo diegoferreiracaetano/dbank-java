@@ -62,7 +62,7 @@ Meta: um segundo serviço Hexagonal que recebe pedidos de transferência com `Id
   - Aprende: por que cada serviço tem seu próprio `Money` em vez de uma biblioteca compartilhada.
 - [x] **M2.4 Casos de uso e portas.** Solicitar e consultar transferência, portas de repositório e de idempotência, fakes.
 - [x] **M2.5 Flyway e adapter JPA.** `transfer` e `idempotency_key` com unicidade.
-- [ ] **M2.6 Idempotência com Redis.** `Idempotency-Key` com `SET NX` e TTL como caminho rápido, constraint única no Postgres como garantia final, e detecção de reuso da chave com corpo diferente.
+- [x] **M2.6 Idempotência com Redis.** `Idempotency-Key` com `SET NX` e TTL como caminho rápido, constraint única no Postgres como garantia final, e detecção de reuso da chave com corpo diferente.
   - Aprende: cache como otimização e o banco como fonte da verdade.
 - [ ] **M2.7 Adapter REST.** `POST /v1/transfers` (202), `GET /v1/transfers/{id}` e `problem+json`.
 - [ ] **M2.8 Testes de integração e ArchUnit.** Postgres e Redis via Testcontainers e as regras de arquitetura do `payments`. As regras principais de ArchUnit e a de acesso a dados só por JPA já entraram no M2.5; faltam as do REST, que chegam junto com o adaptador no M2.7.
