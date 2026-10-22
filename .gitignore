@@ -5,3 +5,5 @@ build/
 .DS_Store
 /out/
 /*/out/
+docs/interview/
+local.properties

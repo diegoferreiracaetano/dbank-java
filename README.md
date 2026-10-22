@@ -86,4 +86,3 @@ Suba cada serviço no perfil `dev`, em terminais separados. O perfil `dev` habil
 - Contratos das APIs: [`ledger`](docs/api/ledger-openapi.yaml) e [`payments`](docs/api/payments-openapi.yaml)
 - Desenho e decisões: [spec](docs/superpowers/specs/2026-10-20-dbank-design.md)
 - Plano e pendências técnicas: [CHECKLIST.md](CHECKLIST.md)
-- Roteiros de estudo para entrevista: [M1](docs/interview/m1-ledger.md) e [M2](docs/interview/m2-payments.md)
