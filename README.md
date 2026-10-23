@@ -28,7 +28,7 @@ Impostos por teste (ArchUnit), então um desvio reprova o build:
 | M0 | Setup de qualidade (lint, cobertura, análise estática) | feito |
 | M1 | `dbank-ledger`: domínio, persistência, REST, documentação, testes de integração e de arquitetura | feito |
 | M2 | `dbank-payments`: domínio, idempotência com Redis, persistência, REST e testes | feito |
-| M3 | `payments` e `ledger` por Kafka: outbox, consumidores idempotentes, retentativa com DLQ e teste ponta a ponta | em fechamento |
+| M3 | `payments` e `ledger` por Kafka: outbox, consumidores idempotentes, retentativa com DLQ e teste ponta a ponta | feito |
 | M4 a M9 | CI, observabilidade, resiliência, Kubernetes | planejado |
 
 Existem o `dbank-ledger` e o `dbank-payments`, que conversam por Kafka.
