@@ -11,7 +11,8 @@ public record Transfer(
         Money amount,
         TransferStatus status,
         FailureReason failureReason,
-        Instant createdAt) {
+        Instant createdAt,
+        Long version) {
 
     public Transfer {
         Objects.requireNonNull(id, "id is required");
@@ -32,12 +33,12 @@ public record Transfer(
     }
 
     public static Transfer request(TransferId id, AccountId from, AccountId to, Money amount, Instant now) {
-        return new Transfer(id, from, to, amount, TransferStatus.PENDING, null, now);
+        return new Transfer(id, from, to, amount, TransferStatus.PENDING, null, now, null);
     }
 
     public Transfer complete() {
         return switch (status) {
-            case PENDING -> new Transfer(id, from, to, amount, TransferStatus.COMPLETED, null, createdAt);
+            case PENDING -> new Transfer(id, from, to, amount, TransferStatus.COMPLETED, null, createdAt, version);
             case COMPLETED -> this;
             case FAILED -> throw new InvalidTransferTransitionException(id, status, "completed");
         };
@@ -46,7 +47,7 @@ public record Transfer(
     public Transfer fail(FailureReason reason) {
         Objects.requireNonNull(reason, "reason is required");
         return switch (status) {
-            case PENDING -> new Transfer(id, from, to, amount, TransferStatus.FAILED, reason, createdAt);
+            case PENDING -> new Transfer(id, from, to, amount, TransferStatus.FAILED, reason, createdAt, version);
             case FAILED -> sameFailure(reason);
             case COMPLETED -> throw new InvalidTransferTransitionException(id, status, "failed with " + reason);
         };

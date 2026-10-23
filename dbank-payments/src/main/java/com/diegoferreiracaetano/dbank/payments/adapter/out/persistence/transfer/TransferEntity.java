@@ -1,6 +1,7 @@
 package com.diegoferreiracaetano.dbank.payments.adapter.out.persistence.transfer;
 
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.FailureReason;
+import com.diegoferreiracaetano.dbank.payments.domain.transfer.Transfer;
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.TransferStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +9,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -38,23 +40,20 @@ class TransferEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Version
+    private Long version;
+
     protected TransferEntity() {}
 
-    TransferEntity(
-            UUID id,
-            UUID fromAccountId,
-            UUID toAccountId,
-            long amountCents,
-            TransferStatus status,
-            FailureReason failureReason,
-            Instant createdAt) {
-        this.id = id;
-        this.fromAccountId = fromAccountId;
-        this.toAccountId = toAccountId;
-        this.amountCents = amountCents;
-        this.status = status;
-        this.failureReason = failureReason;
-        this.createdAt = createdAt;
+    TransferEntity(Transfer transfer) {
+        this.id = transfer.id().value();
+        this.fromAccountId = transfer.from().value();
+        this.toAccountId = transfer.to().value();
+        this.amountCents = transfer.amount().cents();
+        this.status = transfer.status();
+        this.failureReason = transfer.failureReason();
+        this.createdAt = transfer.createdAt();
+        this.version = transfer.version();
     }
 
     UUID getId() {
@@ -83,5 +82,9 @@ class TransferEntity {
 
     Instant getCreatedAt() {
         return createdAt;
+    }
+
+    Long getVersion() {
+        return version;
     }
 }

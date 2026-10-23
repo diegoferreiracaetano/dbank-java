@@ -10,14 +10,7 @@ final class TransferMapper {
     private TransferMapper() {}
 
     static TransferEntity toEntity(Transfer transfer) {
-        return new TransferEntity(
-                transfer.id().value(),
-                transfer.from().value(),
-                transfer.to().value(),
-                transfer.amount().cents(),
-                transfer.status(),
-                transfer.failureReason(),
-                transfer.createdAt());
+        return new TransferEntity(transfer);
     }
 
     static Transfer toDomain(TransferEntity entity) {
@@ -28,6 +21,7 @@ final class TransferMapper {
                 Money.ofCents(entity.getAmountCents()),
                 entity.getStatus(),
                 entity.getFailureReason(),
-                entity.getCreatedAt());
+                entity.getCreatedAt(),
+                entity.getVersion());
     }
 }

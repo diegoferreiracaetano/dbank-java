@@ -11,15 +11,21 @@ import java.util.Optional;
 class InMemoryTransferRepository implements TransferRepository {
 
     private final Map<TransferId, Transfer> transfers = new HashMap<>();
+    private int saves;
 
     @Override
     public void save(Transfer transfer) {
         transfers.put(transfer.id(), transfer);
+        saves++;
     }
 
     @Override
     public Optional<Transfer> findById(TransferId id) {
         return Optional.ofNullable(transfers.get(id));
+    }
+
+    int saves() {
+        return saves;
     }
 
     List<Transfer> all() {

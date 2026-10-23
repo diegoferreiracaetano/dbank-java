@@ -27,7 +27,12 @@ class TransferPersistenceIntegrationTest extends IntegrationTestBase {
 
         var loaded = transfers.findById(transfer.id());
 
-        assertThat(loaded).contains(transfer);
+        assertThat(loaded).isPresent();
+        assertThat(loaded.get())
+                .usingRecursiveComparison()
+                .ignoringFields("version")
+                .isEqualTo(transfer);
+        assertThat(loaded.get().version()).isZero();
     }
 
     @Test
@@ -35,7 +40,7 @@ class TransferPersistenceIntegrationTest extends IntegrationTestBase {
         var transfer = pending();
         transfers.save(transfer);
 
-        transfers.save(transfer.complete());
+        transfers.save(transfers.findById(transfer.id()).orElseThrow().complete());
 
         assertThat(transfers.findById(transfer.id()).orElseThrow().status()).isEqualTo(TransferStatus.COMPLETED);
     }

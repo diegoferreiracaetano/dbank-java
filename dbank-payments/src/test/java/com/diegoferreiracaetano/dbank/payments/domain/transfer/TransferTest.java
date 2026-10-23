@@ -38,7 +38,7 @@ class TransferTest {
     @Test
     void givenFailedStatusWithoutReason_whenCreating_thenShouldReject() {
         assertThatThrownBy(() -> new Transfer(
-                        TransferId.generate(), from, to, Money.ofCents(100), TransferStatus.FAILED, null, NOW))
+                        TransferId.generate(), from, to, Money.ofCents(100), TransferStatus.FAILED, null, NOW, null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -51,7 +51,8 @@ class TransferTest {
                         Money.ofCents(100),
                         TransferStatus.PENDING,
                         FailureReason.INSUFFICIENT_FUNDS,
-                        NOW))
+                        NOW,
+                        null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

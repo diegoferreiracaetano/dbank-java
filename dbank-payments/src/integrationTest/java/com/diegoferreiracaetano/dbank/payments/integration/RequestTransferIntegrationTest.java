@@ -88,7 +88,7 @@ class RequestTransferIntegrationTest extends IntegrationTestBase {
     void givenTransferCompletedMeanwhile_whenReplaying_thenShouldReturnTheCurrentState() {
         var key = newKey();
         var first = service().request(command(key, 100));
-        transfers.save(first.transfer().complete());
+        transfers.save(transfers.findById(first.transfer().id()).orElseThrow().complete());
 
         var replay = service().request(command(key, 100));
 
