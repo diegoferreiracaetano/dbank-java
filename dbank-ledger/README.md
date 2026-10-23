@@ -18,7 +18,7 @@ O contrato completo, com exemplos, está em [`docs/api/ledger-openapi.yaml`](../
 - **Entrada:** `TransferRequestedConsumer` lê `payments.transfer-requested.v1` e chama o caso de uso `ProcessTransferRequestUseCase`, que **devolve** `Settled` ou `Rejected(motivo)` em vez de lançar exceção. Saldo insuficiente e conta inexistente são recusas, e não erros.
 - **Idempotência:** o resultado de cada transferência é guardado em `transfer_outcome`, na mesma transação do lançamento. Uma mensagem repetida devolve o resultado guardado. Isso vale também para recusas: uma transferência recusada por saldo insuficiente continua recusada se a mensagem chegar de novo depois de a conta ser recarregada.
 - **Saída:** o resultado vira um evento na tabela `outbox_event`, na mesma transação, e um relay agendado o publica em `ledger.transfer-result.v1` (`TransferSettled`, ou `TransferRejected` com o motivo). Uma mensagem repetida não gera evento novo.
-- **Falhas:** erro transitório é retentado com espera crescente. Mensagem ilegível vai para `payments.transfer-requested.v1.dlt`. Detalhes em [`docs/events`](../docs/events/README.md).
+- **Falhas:** erro transitório é retentado com espera crescente. Mensagem ilegível vai para `payments.transfer-requested.v1.ledger.dlt`. Detalhes em [`docs/events`](../docs/events/README.md).
 
 O `POST /v1/transactions` continua independente desse fluxo e segue lançando exceções (422, 404).
 

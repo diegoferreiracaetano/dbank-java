@@ -20,7 +20,6 @@ class ArchitectureTest {
     void givenLayers_whenCheckingDependencies_thenShouldOnlyGoDownwards(JavaClasses classes) {
         layeredArchitecture()
                 .consideringOnlyDependenciesInLayers()
-                .withOptionalLayers(true)
                 .layer("Messaging")
                 .definedBy("..messaging..")
                 .layer("Service")
@@ -41,7 +40,6 @@ class ArchitectureTest {
         slices().matching("com.diegoferreiracaetano.dbank.notifications.(*)..")
                 .should()
                 .beFreeOfCycles()
-                .allowEmptyShould(true)
                 .check(classes);
     }
 
@@ -62,7 +60,6 @@ class ArchitectureTest {
                 .areAnnotatedWith(Entity.class)
                 .should()
                 .resideInAPackage("..persistence..")
-                .allowEmptyShould(true)
                 .because("persistence mapping belongs to the persistence layer")
                 .check(classes);
     }

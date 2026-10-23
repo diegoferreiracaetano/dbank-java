@@ -23,7 +23,7 @@ class KafkaTopicsConfiguration {
 
     @Bean
     NewTopic transferResultDeadLetterTopic() {
-        return TopicBuilder.name(TRANSFER_RESULT + ".dlt")
+        return TopicBuilder.name(TRANSFER_RESULT + ".payments.dlt")
                 .partitions(3)
                 .replicas(1)
                 .build();

@@ -21,7 +21,8 @@ class KafkaErrorHandlingConfiguration {
             @Value("${dbank.kafka.retry.max-interval}") Duration maxInterval,
             @Value("${dbank.kafka.retry.max-elapsed-time}") Duration maxElapsedTime) {
         var recoverer = new DeadLetterPublishingRecoverer(
-                template, (record, exception) -> new TopicPartition(record.topic() + ".dlt", record.partition()));
+                template,
+                (record, exception) -> new TopicPartition(record.topic() + ".ledger.dlt", record.partition()));
         var backOff = new ExponentialBackOff(initialInterval.toMillis(), multiplier);
         backOff.setMaxInterval(maxInterval.toMillis());
         backOff.setMaxElapsedTime(maxElapsedTime.toMillis());

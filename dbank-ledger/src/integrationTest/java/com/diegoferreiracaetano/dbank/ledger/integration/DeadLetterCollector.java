@@ -12,7 +12,9 @@ class DeadLetterCollector {
 
     private final List<ConsumerRecord<String, String>> records = new CopyOnWriteArrayList<>();
 
-    @KafkaListener(topics = "payments.transfer-requested.v1.dlt", groupId = "dlt-#{T(java.util.UUID).randomUUID()}")
+    @KafkaListener(
+            topics = "payments.transfer-requested.v1.ledger.dlt",
+            groupId = "dlt-#{T(java.util.UUID).randomUUID()}")
     void collect(ConsumerRecord<String, String> record) {
         records.add(record);
     }

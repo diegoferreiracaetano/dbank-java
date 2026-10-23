@@ -45,7 +45,7 @@ O Redis guarda em cache o registro "chave, assinatura, transferência", que nunc
 - **Saída:** ao aceitar um pedido novo, o serviço grava o evento `TransferRequested` na tabela `outbox_event`, na mesma transação da `Transfer`. Um relay agendado (`dbank.outbox`) publica as linhas pendentes em `payments.transfer-requested.v1`, com a conta de origem como chave, e só as marca como enviadas depois da confirmação do broker. Uma repetição com a mesma `Idempotency-Key` não gera evento novo.
 - **Entrada:** `TransferResultConsumer` lê `ledger.transfer-result.v1` e aplica `TransferSettled` ou `TransferRejected` à transferência. Repetir o mesmo resultado não grava nada.
 - **Concorrência:** a `Transfer` tem `version` (locking otimista). Dois resultados contraditórios simultâneos não se sobrescrevem: o segundo falha, a mensagem é reentregue e a contradição aparece.
-- **Falhas:** erro transitório é retentado com espera crescente. Mensagem ilegível, resultado contraditório ou de transferência inexistente vão para `ledger.transfer-result.v1.dlt`. Detalhes em [`docs/events`](../docs/events/README.md).
+- **Falhas:** erro transitório é retentado com espera crescente. Mensagem ilegível, resultado contraditório ou de transferência inexistente vão para `ledger.transfer-result.v1.payments.dlt`. Detalhes em [`docs/events`](../docs/events/README.md).
 
 ## Erros
 

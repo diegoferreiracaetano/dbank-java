@@ -18,6 +18,14 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
+dbank:
+  kafka:
+    retry:
+      initial-interval: 1s
+      multiplier: 2.0
+      max-interval: 30s
+      max-elapsed-time: 2m
+
 management:
   endpoints:
     web:

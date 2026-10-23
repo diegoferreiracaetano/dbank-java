@@ -41,18 +41,20 @@ Existem o `dbank-ledger` e o `dbank-payments`, que conversam por Kafka.
 3. O `ledger` consome o pedido, tenta a transferência e guarda o resultado (`SETTLED` ou `REJECTED` com o motivo) na mesma transação do lançamento. Uma mensagem repetida devolve o resultado guardado, e nunca move o dinheiro duas vezes.
 4. O resultado vira um evento na outbox do `ledger` (`TransferSettled` ou `TransferRejected`), publicado em `ledger.transfer-result.v1`.
 5. O `payments` consome o resultado e leva a transferência a `COMPLETED` ou `FAILED`, só gravando se o estado mudou. A `Transfer` tem `version`, então escritas contraditórias simultâneas falham em vez de a última vencer.
+6. O `notifications` consome o mesmo evento, em um grupo de consumidores próprio, e avisa o cliente (um adaptador simulado que escreve no log). Cada `eventId` gera no máximo uma notificação.
 
 | Tópico | Quem publica | Quem consome | Mensagens mortas |
 |---|---|---|---|
-| `payments.transfer-requested.v1` | `payments` | `ledger` | `payments.transfer-requested.v1.dlt` |
-| `ledger.transfer-result.v1` | `ledger` | `payments` | `ledger.transfer-result.v1.dlt` |
+| `payments.transfer-requested.v1` | `payments` | `ledger` | `payments.transfer-requested.v1.ledger.dlt` |
+| `ledger.transfer-result.v1` | `ledger` | `payments` | `ledger.transfer-result.v1.payments.dlt` |
+| `ledger.transfer-result.v1` | `ledger` | `notifications` | `ledger.transfer-result.v1.notifications.dlt` |
 
-A entrega é "pelo menos uma vez". Falha transitória (banco fora, conflito de versão) é retentada com espera crescente, de 1s até 30s e no máximo 2 minutos. Mensagem ilegível, contradição entre os serviços ou resultado de transferência inexistente vão direto para o tópico `.dlt`, com a mensagem original e a causa nos cabeçalhos. Os esquemas dos eventos estão em [`docs/events`](docs/events/README.md).
+A entrega é "pelo menos uma vez". Falha transitória (banco fora, conflito de versão) é retentada com espera crescente, de 1s até 30s e no máximo 2 minutos. Mensagem ilegível, contradição entre os serviços ou resultado de transferência inexistente vão direto para o tópico `<tópico>.<serviço>.dlt` (a fila de mensagens mortas é de cada consumidor, então dois serviços que leem o mesmo tópico nunca misturam as suas falhas), com a mensagem original e a causa nos cabeçalhos. Os esquemas dos eventos estão em [`docs/events`](docs/events/README.md).
 
 Para ler a fila de mensagens mortas de um tópico:
 
 ```bash
-docker compose exec kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic payments.transfer-requested.v1.dlt --from-beginning --property print.headers=true
+docker compose exec kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic payments.transfer-requested.v1.ledger.dlt --from-beginning --property print.headers=true
 ```
 
 O reprocessamento de uma mensagem morta é manual: leia a mensagem, corrija a causa e republique o JSON original no tópico de origem.
@@ -96,7 +98,7 @@ Suba cada serviço no perfil `dev`, em terminais separados. O `payments` só con
 |---|---|---|---|
 | `dbank-ledger` | 8081 | `http://localhost:8081/swagger-ui.html` | [README do ledger](dbank-ledger/README.md) |
 | `dbank-payments` | 8082 | `http://localhost:8082/swagger-ui.html` | [README do payments](dbank-payments/README.md) |
-| `dbank-notifications` | 8083 | sem API própria, só `/actuator/health` | em construção (M4) |
+| `dbank-notifications` | 8083 | sem API própria, só `/actuator/health` | [README do notifications](dbank-notifications/README.md) |
 
 ## Rodar tudo com Docker
 
@@ -118,7 +120,7 @@ Para desligar:
 docker compose --profile app down
 ```
 
-O `notifications` sobe junto, na porta 8083, e por enquanto só responde o `health`: ele ganha o consumo dos resultados no M4.4. Com os containers no ar, as portas 8081, 8082 e 8083 ficam ocupadas, então não rode o `bootRun` ao mesmo tempo. Dentro da rede do compose os serviços falam com o Kafka em `kafka:29092`; o `localhost:9092` continua valendo para quem roda pelo `bootRun`.
+O `notifications` sobe junto, na porta 8083, e avisa o cliente de cada resultado (por enquanto só no log do container: `docker compose --profile app logs notifications`). Com os containers no ar, as portas 8081, 8082 e 8083 ficam ocupadas, então não rode o `bootRun` ao mesmo tempo. Dentro da rede do compose os serviços falam com o Kafka em `kafka:29092`; o `localhost:9092` continua valendo para quem roda pelo `bootRun`.
 
 ## Testes e qualidade
 

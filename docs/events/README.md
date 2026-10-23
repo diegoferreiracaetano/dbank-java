@@ -5,7 +5,7 @@ Events are the only thing `payments` and `ledger` share. Each schema is the sour
 | Topic | Producer | Consumer | Schema |
 |---|---|---|---|
 | `payments.transfer-requested.v1` | payments | ledger | [transfer-requested.v1.schema.json](transfer-requested.v1.schema.json) |
-| `ledger.transfer-result.v1` | ledger | payments | [transfer-result.v1.schema.json](transfer-result.v1.schema.json) |
+| `ledger.transfer-result.v1` | ledger | payments, notifications | [transfer-result.v1.schema.json](transfer-result.v1.schema.json) |
 
 ## Envelope
 
@@ -24,7 +24,8 @@ O produtor nunca publica direto. Ele grava o evento numa tabela `outbox_event`, 
 Como a entrega é "pelo menos uma vez", o consumidor tolera repetição por conta própria:
 
 - o `ledger` guarda o resultado de cada transferência (`transfer_outcome`, chave primária no id da transferência) e, ao receber de novo, devolve o resultado guardado, inclusive o de uma recusa;
-- o `payments` aplica o resultado pelas transições idempotentes da `Transfer` e só grava quando o estado muda.
+- o `payments` aplica o resultado pelas transições idempotentes da `Transfer` e só grava quando o estado muda;
+- o `notifications` grava cada notificação com o `eventId` como chave primária, e uma repetição bate na chave e é ignorada.
 
 ## Retentativa e mensagens mortas
 
@@ -33,6 +34,6 @@ Cada consumidor tem um tratador de erros com duas rotas:
 | Tipo de erro | Exemplos | O que acontece |
 |---|---|---|
 | Transitório | banco fora, conflito de versão | nova tentativa com espera crescente (1s, dobrando, teto de 30s, no máximo 2 minutos) |
-| Permanente | JSON ilegível, tipo de evento inesperado, motivo desconhecido, contradição entre os serviços, resultado de transferência inexistente | vai direto para `<tópico>.dlt` |
+| Permanente | JSON ilegível, tipo de evento inesperado, motivo desconhecido, contradição entre os serviços, resultado de transferência inexistente | vai direto para `<tópico>.<serviço>.dlt` |
 
-Se as tentativas se esgotarem, a mensagem também vai para o `.dlt`. Lá ela fica intacta, com os cabeçalhos do Spring Kafka que dizem de onde veio (`kafka_dlt-original-topic`, `kafka_dlt-original-offset`) e por que falhou (`kafka_dlt-exception-message`). A retentativa bloqueia a partição enquanto espera, o que preserva a ordem; os tempos ficam em `dbank.kafka.retry` e precisam somar menos que o `max.poll.interval.ms` do Kafka.
+Se as tentativas se esgotarem, a mensagem também vai para o `.dlt` do consumidor. O nome leva o serviço (`ledger.transfer-result.v1.payments.dlt`, `ledger.transfer-result.v1.notifications.dlt`) porque dois consumidores do mesmo tópico não podem misturar as suas falhas. Lá ela fica intacta, com os cabeçalhos do Spring Kafka que dizem de onde veio (`kafka_dlt-original-topic`, `kafka_dlt-original-offset`) e por que falhou (`kafka_dlt-exception-message`). A retentativa bloqueia a partição enquanto espera, o que preserva a ordem; os tempos ficam em `dbank.kafka.retry` e precisam somar menos que o `max.poll.interval.ms` do Kafka.

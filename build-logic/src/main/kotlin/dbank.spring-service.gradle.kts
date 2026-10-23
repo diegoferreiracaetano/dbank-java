@@ -134,7 +134,7 @@ tasks.jacocoTestCoverageVerification {
     classDirectories.setFrom(
         files(
             classDirectories.files.map {
-                fileTree(it) { include("**/domain/**", "**/application/**") }
+                fileTree(it) { include("**/domain/**", "**/application/**", "**/service/**") }
             }
         )
     )
