@@ -30,6 +30,9 @@ springdoc:
   writer-with-order-by-keys: true
 
 dbank:
+  outbox:
+    batch-size: 100
+    poll-interval: 500ms
   idempotency:
     cache:
       ttl: 24h

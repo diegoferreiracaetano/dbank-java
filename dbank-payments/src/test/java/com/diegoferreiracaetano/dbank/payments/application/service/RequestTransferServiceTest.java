@@ -21,8 +21,9 @@ class RequestTransferServiceTest {
 
     private final InMemoryTransferRepository transfers = new InMemoryTransferRepository();
     private final InMemoryIdempotencyStore idempotency = new InMemoryIdempotencyStore();
+    private final InMemoryTransferEvents events = new InMemoryTransferEvents();
     private final RequestTransferService service =
-            new RequestTransferService(transfers, idempotency, new DirectTransactionRunner(), CLOCK);
+            new RequestTransferService(transfers, idempotency, events, new DirectTransactionRunner(), CLOCK);
 
     private final AccountId from = AccountId.generate();
     private final AccountId to = AccountId.generate();
@@ -89,6 +90,22 @@ class RequestTransferServiceTest {
 
         assertThat(replay.replayed()).isTrue();
         assertThat(replay.transfer().status()).isEqualTo(TransferStatus.COMPLETED);
+    }
+
+    @Test
+    void givenNewKey_whenRequesting_thenShouldRecordOneRequestedEvent() {
+        var result = service.request(command("key-1", 100));
+
+        assertThat(events.requested()).containsExactly(result.transfer());
+    }
+
+    @Test
+    void givenSameKeyAndSameRequest_whenRequestingAgain_thenShouldNotRecordAnotherEvent() {
+        service.request(command("key-1", 100));
+
+        service.request(command("key-1", 100));
+
+        assertThat(events.requested()).hasSize(1);
     }
 
     private RequestTransferCommand command(String key, long cents) {

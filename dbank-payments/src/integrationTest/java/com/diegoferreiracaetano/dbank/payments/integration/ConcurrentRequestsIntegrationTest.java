@@ -7,6 +7,7 @@ import com.diegoferreiracaetano.dbank.payments.application.port.in.RequestTransf
 import com.diegoferreiracaetano.dbank.payments.application.port.in.RequestTransferResult;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.IdempotencyStore;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.TransactionRunner;
+import com.diegoferreiracaetano.dbank.payments.application.port.out.TransferEvents;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.TransferRepository;
 import com.diegoferreiracaetano.dbank.payments.application.service.RequestTransferService;
 import com.diegoferreiracaetano.dbank.payments.domain.shared.Money;
@@ -33,6 +34,9 @@ class ConcurrentRequestsIntegrationTest extends IntegrationTestBase {
     IdempotencyStore idempotency;
 
     @Autowired
+    TransferEvents events;
+
+    @Autowired
     TransactionRunner runner;
 
     @Autowired
@@ -41,7 +45,7 @@ class ConcurrentRequestsIntegrationTest extends IntegrationTestBase {
     @Test
     void givenEightConcurrentRequestsWithTheSameKey_whenRequesting_thenExactlyOneShouldCreateTheTransfer()
             throws Exception {
-        var service = new RequestTransferService(transfers, idempotency, runner, Clock.systemUTC());
+        var service = new RequestTransferService(transfers, idempotency, events, runner, Clock.systemUTC());
         var command = new RequestTransferCommand(
                 new IdempotencyKey(UUID.randomUUID().toString()),
                 AccountId.generate(),

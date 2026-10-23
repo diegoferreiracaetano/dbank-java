@@ -8,6 +8,7 @@ import com.diegoferreiracaetano.dbank.payments.application.idempotency.Idempoten
 import com.diegoferreiracaetano.dbank.payments.application.port.in.RequestTransferCommand;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.IdempotencyStore;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.TransactionRunner;
+import com.diegoferreiracaetano.dbank.payments.application.port.out.TransferEvents;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.TransferRepository;
 import com.diegoferreiracaetano.dbank.payments.application.service.RequestTransferService;
 import com.diegoferreiracaetano.dbank.payments.domain.shared.Money;
@@ -26,6 +27,9 @@ class RequestTransferIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     IdempotencyStore idempotency;
+
+    @Autowired
+    TransferEvents events;
 
     @Autowired
     TransactionRunner runner;
@@ -93,7 +97,7 @@ class RequestTransferIntegrationTest extends IntegrationTestBase {
     }
 
     private RequestTransferService service() {
-        return new RequestTransferService(transfers, idempotency, runner, Clock.systemUTC());
+        return new RequestTransferService(transfers, idempotency, events, runner, Clock.systemUTC());
     }
 
     private RequestTransferCommand command(IdempotencyKey key, long cents) {

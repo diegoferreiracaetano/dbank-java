@@ -75,7 +75,7 @@ Meta: a transferência pedida no `payments` é executada no `ledger` e o resulta
 
 - [x] **M3.1 Kafka no ambiente e contratos dos eventos.** Kafka no compose, tópicos, `spring-kafka` nos dois serviços, Testcontainers com Kafka, os esquemas dos eventos em `docs/events` e um teste de ida e volta em cada serviço.
   - Aprende: tópico, partição, chave, grupo de consumidores e entrega "pelo menos uma vez".
-- [ ] **M3.2 Outbox no `payments`.** Tabela de eventos gravada na mesma transação da transferência e um publicador que envia ao Kafka e marca como enviado.
+- [x] **M3.2 Outbox no `payments`.** Tabela de eventos gravada na mesma transação da transferência e um publicador que envia ao Kafka e marca como enviado.
   - Aprende: por que gravar no banco e publicar depois, em vez de publicar direto.
 - [ ] **M3.3 Consumidor no `ledger`.** Consome o pedido, executa a transferência (já idempotente) e traduz as falhas de negócio em resultado.
 - [ ] **M3.4 Outbox no `ledger` e resultado da transferência.** O resultado (concluída ou recusada) é gravado na mesma transação do lançamento e publicado.
@@ -109,3 +109,5 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Módulo só de suporte a testes (containers, regras de arquitetura) | duplicado entre dois serviços; a regra dos três manda esperar o terceiro | M4, com o `notifications` |
 | Health agregando o Redis | um Redis fora aparece como `DOWN` mesmo com o serviço funcionando degradado, e separar liveness de readiness é trabalho de observabilidade | M5 ou M8 |
 | Kafka fixado em `apache/kafka:3.8.0` | a 3.9.0 recusa o `0.0.0.0` em `advertised.listeners` que o Testcontainers injeta | subir de versão quando o Testcontainers corrigir |
+| Limpeza das linhas enviadas da outbox | as linhas com `sent_at` preenchido nunca são apagadas | M5 ou M6, junto com a limpeza das chaves de idempotência |
+| Ordem dos eventos com várias instâncias | o `SKIP LOCKED` deixa duas instâncias publicarem lotes diferentes ao mesmo tempo, sem ordem global nem por conta | só se o consumo passar a depender de ordem; hoje o `ledger` trata cada transferência de forma independente |

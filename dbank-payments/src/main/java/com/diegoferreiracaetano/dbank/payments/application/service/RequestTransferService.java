@@ -9,6 +9,7 @@ import com.diegoferreiracaetano.dbank.payments.application.port.in.RequestTransf
 import com.diegoferreiracaetano.dbank.payments.application.port.in.RequestTransferUseCase;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.IdempotencyStore;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.TransactionRunner;
+import com.diegoferreiracaetano.dbank.payments.application.port.out.TransferEvents;
 import com.diegoferreiracaetano.dbank.payments.application.port.out.TransferRepository;
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.Transfer;
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.TransferId;
@@ -19,16 +20,19 @@ public class RequestTransferService implements RequestTransferUseCase {
 
     private final TransferRepository transfers;
     private final IdempotencyStore idempotency;
+    private final TransferEvents events;
     private final TransactionRunner transactionRunner;
     private final Clock clock;
 
     public RequestTransferService(
             TransferRepository transfers,
             IdempotencyStore idempotency,
+            TransferEvents events,
             TransactionRunner transactionRunner,
             Clock clock) {
         this.transfers = transfers;
         this.idempotency = idempotency;
+        this.events = events;
         this.transactionRunner = transactionRunner;
         this.clock = clock;
     }
@@ -46,6 +50,7 @@ public class RequestTransferService implements RequestTransferUseCase {
         return switch (idempotency.claim(record)) {
             case ClaimResult.Claimed() -> {
                 transfers.save(candidate);
+                events.transferRequested(candidate);
                 yield new RequestTransferResult(candidate, false);
             }
             case ClaimResult.Existing(var existing) -> replay(existing, record.fingerprint());
