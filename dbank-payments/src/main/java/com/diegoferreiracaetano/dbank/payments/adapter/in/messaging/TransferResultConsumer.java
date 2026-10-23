@@ -4,22 +4,16 @@ import com.diegoferreiracaetano.dbank.payments.application.port.in.ApplyTransfer
 import com.diegoferreiracaetano.dbank.payments.application.port.in.ApplyTransferResultUseCase;
 import com.diegoferreiracaetano.dbank.payments.application.port.in.TransferResult;
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.FailureReason;
-import com.diegoferreiracaetano.dbank.payments.domain.transfer.InvalidTransferTransitionException;
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.TransferId;
-import com.diegoferreiracaetano.dbank.payments.domain.transfer.TransferNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.stereotype.Component;
 
 @Component
 class TransferResultConsumer {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TransferResultConsumer.class);
 
     private final ApplyTransferResultUseCase useCase;
     private final ObjectMapper mapper;
@@ -31,45 +25,31 @@ class TransferResultConsumer {
 
     @KafkaListener(topics = "ledger.transfer-result.v1")
     void onMessage(String value) {
-        parse(value).ifPresent(this::apply);
+        useCase.apply(parse(value));
     }
 
-    private void apply(ApplyTransferResultCommand command) {
-        try {
-            useCase.apply(command);
-        } catch (InvalidTransferTransitionException | TransferNotFoundException e) {
-            LOG.error("Result conflicts with the transfer state; not retrying: {}", command, e);
-        }
-    }
-
-    private Optional<ApplyTransferResultCommand> parse(String value) {
+    private ApplyTransferResultCommand parse(String value) {
         try {
             var envelope = mapper.readValue(value, Envelope.class);
             var payload = envelope.payload();
             if (payload == null || envelope.eventType() == null) {
-                LOG.warn("Discarding result with unexpected shape: {}", value);
-                return Optional.empty();
+                throw new MessageConversionException("Unexpected message shape");
             }
-            var transferId = new TransferId(payload.transferId());
-            var result = resultOf(envelope.eventType(), payload.reason());
-            if (result.isEmpty()) {
-                LOG.warn("Discarding result with unexpected shape: {}", value);
-            }
-            return result.map(r -> new ApplyTransferResultCommand(transferId, r));
+            return new ApplyTransferResultCommand(
+                    new TransferId(payload.transferId()), resultOf(envelope.eventType(), payload.reason()));
         } catch (JsonProcessingException | IllegalArgumentException e) {
-            LOG.warn("Discarding unreadable result: {}", value, e);
-            return Optional.empty();
+            throw new MessageConversionException("Unreadable message", e);
         }
     }
 
-    private Optional<TransferResult> resultOf(String eventType, String reason) {
+    private TransferResult resultOf(String eventType, String reason) {
         if ("TransferSettled".equals(eventType)) {
-            return Optional.of(new TransferResult.Settled());
+            return new TransferResult.Settled();
         }
         if ("TransferRejected".equals(eventType) && reason != null) {
-            return Optional.of(new TransferResult.Rejected(FailureReason.valueOf(reason)));
+            return new TransferResult.Rejected(FailureReason.valueOf(reason));
         }
-        return Optional.empty();
+        throw new MessageConversionException("Unexpected event type " + eventType);
     }
 
     private record Envelope(String eventType, Payload payload) {}

@@ -80,7 +80,7 @@ Meta: a transferência pedida no `payments` é executada no `ledger` e o resulta
 - [x] **M3.3 Consumidor no `ledger`.** Consome o pedido, executa a transferência (já idempotente) e traduz as falhas de negócio em resultado.
 - [x] **M3.4 Outbox no `ledger` e resultado da transferência.** O resultado (concluída ou recusada) é gravado na mesma transação do lançamento e publicado.
 - [x] **M3.5 Consumidor no `payments`.** Aplica o resultado na `Transfer` com as transições idempotentes e decide se ela precisa de `version`.
-- [ ] **M3.6 Retentativa com espera crescente e fila de mensagens mortas.** Falha transitória tenta de novo; mensagem impossível vai para a DLQ.
+- [x] **M3.6 Retentativa com espera crescente e fila de mensagens mortas.** Falha transitória tenta de novo; mensagem impossível vai para a DLQ.
 - [ ] **M3.7 Ponta a ponta e documentação.** Uma transferência pedida no `payments` termina `COMPLETED` ou `FAILED`, e os READMEs e a spec passam a descrever o fluxo.
 - [ ] **M3.8 Fechamento.** Clone limpo e arrumação dos documentos.
 

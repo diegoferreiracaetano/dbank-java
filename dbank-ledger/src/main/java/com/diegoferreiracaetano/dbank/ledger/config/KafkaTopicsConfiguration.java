@@ -20,4 +20,12 @@ class KafkaTopicsConfiguration {
     NewTopic transferRequestedTopic() {
         return TopicBuilder.name(TRANSFER_REQUESTED).partitions(3).replicas(1).build();
     }
+
+    @Bean
+    NewTopic transferRequestedDeadLetterTopic() {
+        return TopicBuilder.name(TRANSFER_REQUESTED + ".dlt")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 }

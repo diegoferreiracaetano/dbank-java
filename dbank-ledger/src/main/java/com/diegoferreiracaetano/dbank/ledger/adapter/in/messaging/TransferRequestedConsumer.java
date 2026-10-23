@@ -7,11 +7,11 @@ import com.diegoferreiracaetano.dbank.ledger.domain.ledger.LedgerTransactionId;
 import com.diegoferreiracaetano.dbank.ledger.domain.shared.Money;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,28 +29,25 @@ class TransferRequestedConsumer {
 
     @KafkaListener(topics = "payments.transfer-requested.v1")
     void onMessage(String value) {
-        parse(value).ifPresent(command -> {
-            var outcome = useCase.process(command);
-            LOG.info("Transfer {} processed: {}", command.transactionId().value(), outcome);
-        });
+        var command = parse(value);
+        var outcome = useCase.process(command);
+        LOG.info("Transfer {} processed: {}", command.transactionId().value(), outcome);
     }
 
-    private Optional<PostTransferCommand> parse(String value) {
+    private PostTransferCommand parse(String value) {
         try {
             var envelope = mapper.readValue(value, Envelope.class);
             if (!"TransferRequested".equals(envelope.eventType()) || envelope.payload() == null) {
-                LOG.warn("Discarding message with unexpected shape: {}", value);
-                return Optional.empty();
+                throw new MessageConversionException("Unexpected message shape");
             }
             var payload = envelope.payload();
-            return Optional.of(new PostTransferCommand(
+            return new PostTransferCommand(
                     new LedgerTransactionId(payload.transferId()),
                     new AccountId(payload.fromAccountId()),
                     new AccountId(payload.toAccountId()),
-                    Money.ofCents(payload.amountCents())));
+                    Money.ofCents(payload.amountCents()));
         } catch (JsonProcessingException | IllegalArgumentException e) {
-            LOG.warn("Discarding unreadable message: {}", value, e);
-            return Optional.empty();
+            throw new MessageConversionException("Unreadable message", e);
         }
     }
 

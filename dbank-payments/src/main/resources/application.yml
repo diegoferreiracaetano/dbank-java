@@ -30,6 +30,12 @@ springdoc:
   writer-with-order-by-keys: true
 
 dbank:
+  kafka:
+    retry:
+      initial-interval: 1s
+      multiplier: 2.0
+      max-interval: 30s
+      max-elapsed-time: 2m
   outbox:
     batch-size: 100
     poll-interval: 500ms
