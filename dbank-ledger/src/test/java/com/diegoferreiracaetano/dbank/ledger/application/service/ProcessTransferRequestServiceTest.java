@@ -3,6 +3,7 @@ package com.diegoferreiracaetano.dbank.ledger.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.diegoferreiracaetano.dbank.ledger.application.port.in.PostTransferCommand;
+import com.diegoferreiracaetano.dbank.ledger.application.service.InMemoryTransferResultEvents.RecordedEvent;
 import com.diegoferreiracaetano.dbank.ledger.application.transfer.RejectionReason;
 import com.diegoferreiracaetano.dbank.ledger.application.transfer.TransferOutcome;
 import com.diegoferreiracaetano.dbank.ledger.domain.account.Account;
@@ -21,8 +22,9 @@ class ProcessTransferRequestServiceTest {
     private final InMemoryAccountRepository accounts = new InMemoryAccountRepository();
     private final InMemoryLedgerTransactionRepository transactions = new InMemoryLedgerTransactionRepository();
     private final InMemoryTransferOutcomes outcomes = new InMemoryTransferOutcomes();
-    private final ProcessTransferRequestService service =
-            new ProcessTransferRequestService(accounts, transactions, outcomes, new DirectTransactionRunner(), CLOCK);
+    private final InMemoryTransferResultEvents events = new InMemoryTransferResultEvents();
+    private final ProcessTransferRequestService service = new ProcessTransferRequestService(
+            accounts, transactions, outcomes, events, new DirectTransactionRunner(), CLOCK);
 
     private final AccountId from = AccountId.generate();
     private final AccountId to = AccountId.generate();
@@ -96,6 +98,39 @@ class ProcessTransferRequestServiceTest {
         assertThat(again).isEqualTo(new TransferOutcome.Rejected(RejectionReason.INSUFFICIENT_FUNDS));
         assertThat(balanceOf(from)).isEqualTo(Money.ofCents(10_000));
         assertThat(transactions.all()).isEmpty();
+    }
+
+    @Test
+    void givenSettledTransfer_whenProcessing_thenShouldRecordOneEventWithTheOutcome() {
+        fund(1_000, 0);
+        var command = command(to, 100);
+
+        service.process(command);
+
+        assertThat(events.recorded())
+                .containsExactly(new RecordedEvent(command.transactionId(), from, new TransferOutcome.Settled()));
+    }
+
+    @Test
+    void givenRejectedTransfer_whenProcessing_thenShouldRecordOneEventWithTheReason() {
+        fund(1_000, 0);
+
+        service.process(command(to, 5_000));
+
+        assertThat(events.recorded()).hasSize(1);
+        assertThat(events.recorded().get(0).outcome())
+                .isEqualTo(new TransferOutcome.Rejected(RejectionReason.INSUFFICIENT_FUNDS));
+    }
+
+    @Test
+    void givenSameTransferTwice_whenProcessing_thenShouldRecordOnlyOneEvent() {
+        fund(1_000, 0);
+        var command = command(to, 100);
+        service.process(command);
+
+        service.process(command);
+
+        assertThat(events.recorded()).hasSize(1);
     }
 
     private void fund(long fromCents, long toCents) {

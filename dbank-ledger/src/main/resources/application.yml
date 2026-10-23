@@ -22,6 +22,11 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
+dbank:
+  outbox:
+    batch-size: 100
+    poll-interval: 500ms
+
 springdoc:
   swagger-ui:
     enabled: false

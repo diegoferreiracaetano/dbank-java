@@ -6,6 +6,7 @@ import com.diegoferreiracaetano.dbank.ledger.application.port.out.AccountReposit
 import com.diegoferreiracaetano.dbank.ledger.application.port.out.LedgerTransactionRepository;
 import com.diegoferreiracaetano.dbank.ledger.application.port.out.TransactionRunner;
 import com.diegoferreiracaetano.dbank.ledger.application.port.out.TransferOutcomes;
+import com.diegoferreiracaetano.dbank.ledger.application.port.out.TransferResultEvents;
 import com.diegoferreiracaetano.dbank.ledger.application.transfer.RejectionReason;
 import com.diegoferreiracaetano.dbank.ledger.application.transfer.TransferOutcome;
 import com.diegoferreiracaetano.dbank.ledger.domain.account.Account;
@@ -18,6 +19,7 @@ public class ProcessTransferRequestService implements ProcessTransferRequestUseC
     private final AccountRepository accounts;
     private final LedgerTransactionRepository transactions;
     private final TransferOutcomes outcomes;
+    private final TransferResultEvents events;
     private final TransactionRunner transactionRunner;
     private final Clock clock;
 
@@ -25,11 +27,13 @@ public class ProcessTransferRequestService implements ProcessTransferRequestUseC
             AccountRepository accounts,
             LedgerTransactionRepository transactions,
             TransferOutcomes outcomes,
+            TransferResultEvents events,
             TransactionRunner transactionRunner,
             Clock clock) {
         this.accounts = accounts;
         this.transactions = transactions;
         this.outcomes = outcomes;
+        this.events = events;
         this.transactionRunner = transactionRunner;
         this.clock = clock;
     }
@@ -46,6 +50,7 @@ public class ProcessTransferRequestService implements ProcessTransferRequestUseC
         }
         var outcome = attempt(command);
         outcomes.save(command.transactionId(), outcome, clock.instant());
+        events.transferProcessed(command.transactionId(), command.from(), outcome);
         return outcome;
     }
 
