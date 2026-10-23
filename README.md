@@ -96,6 +96,28 @@ Suba cada serviço no perfil `dev`, em terminais separados. O `payments` só con
 | `dbank-ledger` | 8081 | `http://localhost:8081/swagger-ui.html` | [README do ledger](dbank-ledger/README.md) |
 | `dbank-payments` | 8082 | `http://localhost:8082/swagger-ui.html` | [README do payments](dbank-payments/README.md) |
 
+## Rodar tudo com Docker
+
+Cada serviço tem uma imagem, construída pelo `Dockerfile` da raiz (compila dentro do Docker, em camadas, e roda com um usuário sem privilégios). O compose os sobe sob o *profile* `app`, então o `docker compose up -d` de sempre continua subindo só a infraestrutura.
+
+```bash
+docker compose --profile app up -d --build
+```
+
+O primeiro build baixa o Gradle e as dependências e leva alguns minutos. Quando os dois containers estiverem `healthy` (`docker compose ps`), o roteiro abaixo abre duas contas, financia uma e faz uma transferência pelo `payments`, esperando o `ledger` concluí-la:
+
+```bash
+./scripts/smoke.sh
+```
+
+Para desligar:
+
+```bash
+docker compose --profile app down
+```
+
+Com os containers no ar, as portas 8081 e 8082 ficam ocupadas, então não rode o `bootRun` ao mesmo tempo. Dentro da rede do compose os serviços falam com o Kafka em `kafka:29092`; o `localhost:9092` continua valendo para quem roda pelo `bootRun`.
+
 ## Testes e qualidade
 
 | Comando | O que roda |

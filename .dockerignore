@@ -1,0 +1,10 @@
+.git
+.gradle
+.idea
+**/build
+out
+*/out
+local.properties
+.github
+docs
+*.md

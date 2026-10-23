@@ -90,7 +90,7 @@ Meta: o pipeline não tem lógica própria (só chama `check` e `e2eTest`), o pr
 
 - [x] **M4.1 CI no GitHub Actions.** Workflow com `./gradlew check` (JDK 21, cache do Gradle) e `e2eTest` em um job separado, relatórios como artefatos, permissões mínimas e lint dos contratos OpenAPI (Spectral).
   - Aprende: o que fica no build e o que fica no CI, e por que o CI não repete cada ferramenta.
-- [ ] **M4.2 Imagens Docker.** Um Dockerfile multi-stage por serviço (jar em camadas, usuário sem privilégios, healthcheck), e o compose passa a subir a infraestrutura e os serviços.
+- [x] **M4.2 Imagens Docker.** Um Dockerfile multi-stage por serviço (jar em camadas, usuário sem privilégios, healthcheck), e o compose passa a subir a infraestrutura e os serviços.
   - Aprende: imagem enxuta e reproduzível, e o compose como ambiente de demonstração.
 - [ ] **M4.3 Esqueleto do `dbank-notifications`.** Módulo, porta 8083, banco próprio, health, arquitetura em camadas (decisão da spec).
 - [ ] **M4.4 Consumo e notificação.** Consome `ledger.transfer-result.v1` em um grupo próprio, notifica por um adaptador simulado (log), idempotente por `eventId`, com retentativa e DLQ.
@@ -129,3 +129,4 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Mensagens na DLQ sem alerta nem ferramenta de reprocesso | uma mensagem morta é uma transferência presa em `PENDING`, e hoje só se descobre lendo o tópico | M5 (alerta sobre a DLQ e transferências `PENDING` antigas) e M6 (reprocesso) |
 | Ações do CI fixadas por versão exata, e não por SHA | não consigo consultar o GitHub daqui para obter os SHAs | quando o repositório existir: fixar por SHA e deixar o Dependabot atualizar |
 | CI nunca executado de verdade | não existe repositório remoto; a sintaxe e cada comando foram validados localmente | primeira publicação no GitHub; se alguma versão de ação não existir, trocar o número |
+| Build das imagens no CI e publicação em um registro | ainda não há registro para onde publicar | M8, junto com o Kubernetes |
