@@ -4,14 +4,17 @@ import com.diegoferreiracaetano.dbank.ledger.application.port.in.GetAccountUseCa
 import com.diegoferreiracaetano.dbank.ledger.application.port.in.GetStatementUseCase;
 import com.diegoferreiracaetano.dbank.ledger.application.port.in.OpenAccountUseCase;
 import com.diegoferreiracaetano.dbank.ledger.application.port.in.PostTransferUseCase;
+import com.diegoferreiracaetano.dbank.ledger.application.port.in.ProcessTransferRequestUseCase;
 import com.diegoferreiracaetano.dbank.ledger.application.port.out.AccountRepository;
 import com.diegoferreiracaetano.dbank.ledger.application.port.out.LedgerEntryRepository;
 import com.diegoferreiracaetano.dbank.ledger.application.port.out.LedgerTransactionRepository;
 import com.diegoferreiracaetano.dbank.ledger.application.port.out.TransactionRunner;
+import com.diegoferreiracaetano.dbank.ledger.application.port.out.TransferOutcomes;
 import com.diegoferreiracaetano.dbank.ledger.application.service.GetAccountService;
 import com.diegoferreiracaetano.dbank.ledger.application.service.GetStatementService;
 import com.diegoferreiracaetano.dbank.ledger.application.service.OpenAccountService;
 import com.diegoferreiracaetano.dbank.ledger.application.service.PostTransferService;
+import com.diegoferreiracaetano.dbank.ledger.application.service.ProcessTransferRequestService;
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +34,16 @@ class LedgerConfiguration {
             TransactionRunner transactionRunner,
             Clock clock) {
         return new PostTransferService(accounts, transactions, transactionRunner, clock);
+    }
+
+    @Bean
+    ProcessTransferRequestUseCase processTransferRequestUseCase(
+            AccountRepository accounts,
+            LedgerTransactionRepository transactions,
+            TransferOutcomes outcomes,
+            TransactionRunner transactionRunner,
+            Clock clock) {
+        return new ProcessTransferRequestService(accounts, transactions, outcomes, transactionRunner, clock);
     }
 
     @Bean
