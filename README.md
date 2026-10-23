@@ -105,6 +105,7 @@ Suba cada serviço no perfil `dev`, em terminais separados. O `payments` só con
 | `./gradlew check` | tudo: formatação, Checkstyle, SpotBugs, testes e cobertura mínima |
 | `./gradlew e2eTest` | ponta a ponta: sobe Postgres, Redis e Kafka (Testcontainers) e os dois serviços como processos reais, e dirige o fluxo só por HTTP; fora do `check`, por ser lento |
 | `./gradlew spotlessApply` | corrige a formatação |
+| CI (GitHub Actions) | em cada push na `main` e em cada pull request: lint dos contratos, `./gradlew check` e, se o `check` passar, `./gradlew e2eTest` |
 
 ## Documentação
 

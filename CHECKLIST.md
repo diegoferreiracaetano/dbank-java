@@ -88,7 +88,7 @@ Meta: a transferência pedida no `payments` é executada no `ledger` e o resulta
 
 Meta: o pipeline não tem lógica própria (só chama `check` e `e2eTest`), o projeto sobe inteiro com `docker compose up`, e entra o terceiro serviço, mais simples e em camadas, que consome o resultado das transferências. O `notifications` só consome, então não ganha uma terceira outbox.
 
-- [ ] **M4.1 CI no GitHub Actions.** Workflow com `./gradlew check` (JDK 21, cache do Gradle) e `e2eTest` em um job separado, relatórios como artefatos, permissões mínimas e lint dos contratos OpenAPI (Spectral).
+- [x] **M4.1 CI no GitHub Actions.** Workflow com `./gradlew check` (JDK 21, cache do Gradle) e `e2eTest` em um job separado, relatórios como artefatos, permissões mínimas e lint dos contratos OpenAPI (Spectral).
   - Aprende: o que fica no build e o que fica no CI, e por que o CI não repete cada ferramenta.
 - [ ] **M4.2 Imagens Docker.** Um Dockerfile multi-stage por serviço (jar em camadas, usuário sem privilégios, healthcheck), e o compose passa a subir a infraestrutura e os serviços.
   - Aprende: imagem enxuta e reproduzível, e o compose como ambiente de demonstração.
@@ -113,7 +113,7 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Paginação do extrato por offset | simples e correta; cara em páginas muito profundas | M6, com cursor (`created_at`, `id`) depois de medir |
 | `save` de `LedgerTransaction` faz `SELECT` antes | id atribuído e sem `@Version` leva o Spring Data ao `merge` | M6, medir; se pesar, `Persistable` ou `EntityManager.persist` |
 | Cobertura dos testes de integração fora do JaCoCo | o mínimo mede só `domain` e `application`, que os unitários já cobrem | M4, junto com o CI |
-| Lint do contrato (Spectral) e publicação estática da documentação | dependem do CI | M4 |
+| Publicação estática da documentação (Swagger UI hospedado) | depende de ter o repositório no GitHub | depois que o repositório existir; o lint do contrato (Spectral) entrou no M4.1 |
 | Conta `treasury` com saldo finito | simplificação de dev: `Money` não admite negativo, e um ledger real deixa a conta de origem ficar negativa | permanente, só no perfil `dev` |
 | Testcontainers fixado em 1.21.4 | o Docker Engine 29 exige API 1.40 ou superior, e a 1.21.3 do BOM do Spring Boot 3.5.6 falava a 1.32 | remover o `extra["testcontainers.version"]` quando o BOM trouxer versão compatível |
 | Limpeza das chaves de idempotência expiradas no Postgres | as chaves não expiram no banco, e só o cache (M2.6) terá prazo | M5 ou M6, com um job agendado que apague o que passou do prazo de retenção |
@@ -127,3 +127,5 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Plugin `dbank.e2e` repete a formatação e o Checkstyle do `dbank.spring-service` | cerca de 25 linhas duplicadas, para não refatorar o plugin existente no meio do M3 | extrair um `dbank.java-quality` quando houver um terceiro módulo |
 | `e2eTest` fora do `check` | sobe três containers e duas JVMs, então é lento | M4: o CI o executa em um passo separado |
 | Mensagens na DLQ sem alerta nem ferramenta de reprocesso | uma mensagem morta é uma transferência presa em `PENDING`, e hoje só se descobre lendo o tópico | M5 (alerta sobre a DLQ e transferências `PENDING` antigas) e M6 (reprocesso) |
+| Ações do CI fixadas por versão exata, e não por SHA | não consigo consultar o GitHub daqui para obter os SHAs | quando o repositório existir: fixar por SHA e deixar o Dependabot atualizar |
+| CI nunca executado de verdade | não existe repositório remoto; a sintaxe e cada comando foram validados localmente | primeira publicação no GitHub; se alguma versão de ação não existir, trocar o número |
