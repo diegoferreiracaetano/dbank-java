@@ -112,4 +112,4 @@ Suba cada serviço no perfil `dev`, em terminais separados. O `payments` só con
 - Contratos dos eventos entre os serviços: [`docs/events`](docs/events/README.md)
 - Desenho e decisões: [spec](docs/superpowers/specs/2026-10-20-dbank-design.md)
 - Plano e pendências técnicas: [CHECKLIST.md](CHECKLIST.md)
-- Roteiros de consulta: [M0 e build](docs/interview/m0-qualidade-e-build.md), [M1](docs/interview/m1-ledger.md) e [M2](docs/interview/m2-payments.md)
+- Roteiros de consulta: [M0 e build](docs/interview/m0-qualidade-e-build.md), [M1](docs/interview/m1-ledger.md), [M2](docs/interview/m2-payments.md) e [M3](docs/interview/m3-kafka.md)
