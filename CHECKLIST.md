@@ -84,7 +84,21 @@ Meta: a transferência pedida no `payments` é executada no `ledger` e o resulta
 - [x] **M3.7 Ponta a ponta e documentação.** Uma transferência pedida no `payments` termina `COMPLETED` ou `FAILED`, e os READMEs e a spec passam a descrever o fluxo.
 - [x] **M3.8 Fechamento.** Clone limpo e arrumação dos documentos.
 
-## M4 a M9
+## M4 — CI, imagens e `dbank-notifications`
+
+Meta: o pipeline não tem lógica própria (só chama `check` e `e2eTest`), o projeto sobe inteiro com `docker compose up`, e entra o terceiro serviço, mais simples e em camadas, que consome o resultado das transferências. O `notifications` só consome, então não ganha uma terceira outbox.
+
+- [ ] **M4.1 CI no GitHub Actions.** Workflow com `./gradlew check` (JDK 21, cache do Gradle) e `e2eTest` em um job separado, relatórios como artefatos, permissões mínimas e lint dos contratos OpenAPI (Spectral).
+  - Aprende: o que fica no build e o que fica no CI, e por que o CI não repete cada ferramenta.
+- [ ] **M4.2 Imagens Docker.** Um Dockerfile multi-stage por serviço (jar em camadas, usuário sem privilégios, healthcheck), e o compose passa a subir a infraestrutura e os serviços.
+  - Aprende: imagem enxuta e reproduzível, e o compose como ambiente de demonstração.
+- [ ] **M4.3 Esqueleto do `dbank-notifications`.** Módulo, porta 8083, banco próprio, health, arquitetura em camadas (decisão da spec).
+- [ ] **M4.4 Consumo e notificação.** Consome `ledger.transfer-result.v1` em um grupo próprio, notifica por um adaptador simulado (log), idempotente por `eventId`, com retentativa e DLQ.
+  - Aprende: vários grupos de consumidores no mesmo tópico, e idempotência por `eventId`.
+- [ ] **M4.5 Código compartilhado de teste e de build.** Com três serviços, vale a regra dos três: extrair o módulo de apoio a testes (containers e regras de arquitetura) e o `dbank.java-quality`. Também a cobertura dos testes de integração no JaCoCo.
+- [ ] **M4.6 Fechamento.** Clone limpo e roteiro de consulta do M4.
+
+## M5 a M9
 
 Detalhados quando o marco anterior fechar. Ver seção 4 da spec.
 
