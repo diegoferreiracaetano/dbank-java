@@ -92,7 +92,7 @@ Meta: o pipeline não tem lógica própria (só chama `check` e `e2eTest`), o pr
   - Aprende: o que fica no build e o que fica no CI, e por que o CI não repete cada ferramenta.
 - [x] **M4.2 Imagens Docker.** Um Dockerfile multi-stage por serviço (jar em camadas, usuário sem privilégios, healthcheck), e o compose passa a subir a infraestrutura e os serviços.
   - Aprende: imagem enxuta e reproduzível, e o compose como ambiente de demonstração.
-- [ ] **M4.3 Esqueleto do `dbank-notifications`.** Módulo, porta 8083, banco próprio, health, arquitetura em camadas (decisão da spec).
+- [x] **M4.3 Esqueleto do `dbank-notifications`.** Módulo, porta 8083, banco próprio, health, arquitetura em camadas (decisão da spec).
 - [ ] **M4.4 Consumo e notificação.** Consome `ledger.transfer-result.v1` em um grupo próprio, notifica por um adaptador simulado (log), idempotente por `eventId`, com retentativa e DLQ.
   - Aprende: vários grupos de consumidores no mesmo tópico, e idempotência por `eventId`.
 - [ ] **M4.5 Código compartilhado de teste e de build.** Com três serviços, vale a regra dos três: extrair o módulo de apoio a testes (containers e regras de arquitetura) e o `dbank.java-quality`. Também a cobertura dos testes de integração no JaCoCo.
@@ -130,3 +130,5 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Ações do CI fixadas por versão exata, e não por SHA | não consigo consultar o GitHub daqui para obter os SHAs | quando o repositório existir: fixar por SHA e deixar o Dependabot atualizar |
 | CI nunca executado de verdade | não existe repositório remoto; a sintaxe e cada comando foram validados localmente | primeira publicação no GitHub; se alguma versão de ação não existir, trocar o número |
 | Build das imagens no CI e publicação em um registro | ainda não há registro para onde publicar | M8, junto com o Kubernetes |
+| Cobertura mínima só cobre `domain` e `application` | o `notifications` é em camadas, e a lógica dele vive em `service` | M4.4: incluir `**/service/**` na regra do plugin quando houver código |
+| Regras de camadas do `notifications` toleram pacotes vazios (`withOptionalLayers`, `allowEmptyShould`) | os pacotes `messaging`, `service` e `persistence` só nascem no M4.4 | M4.4: remover a tolerância, para um erro de nome de pacote voltar a reprovar |

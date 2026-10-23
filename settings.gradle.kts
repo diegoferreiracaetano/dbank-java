@@ -11,3 +11,4 @@ rootProject.name = "dbank"
 include("dbank-ledger")
 include("dbank-payments")
 include("dbank-e2e")
+include("dbank-notifications")

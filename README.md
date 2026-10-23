@@ -29,7 +29,8 @@ Impostos por teste (ArchUnit), então um desvio reprova o build:
 | M1 | `dbank-ledger`: domínio, persistência, REST, documentação, testes de integração e de arquitetura | feito |
 | M2 | `dbank-payments`: domínio, idempotência com Redis, persistência, REST e testes | feito |
 | M3 | `payments` e `ledger` por Kafka: outbox, consumidores idempotentes, retentativa com DLQ e teste ponta a ponta | feito |
-| M4 a M9 | CI, observabilidade, resiliência, Kubernetes | planejado |
+| M4 | CI (GitHub Actions), imagens Docker e `dbank-notifications` | em andamento |
+| M5 a M9 | Observabilidade, resiliência, Kubernetes | planejado |
 
 Existem o `dbank-ledger` e o `dbank-payments`, que conversam por Kafka.
 
@@ -75,10 +76,10 @@ Suba o Postgres, o Redis e o Kafka:
 docker compose up -d
 ```
 
-Em um volume do Postgres que já existia, crie uma vez o banco do `payments`:
+Em um volume do Postgres que já existia, crie uma vez os bancos do `payments` e do `notifications`:
 
 ```bash
-docker compose exec postgres psql -U dbank -d postgres -c "CREATE DATABASE payments"
+docker compose exec postgres psql -U dbank -d postgres -c "CREATE DATABASE payments" -c "CREATE DATABASE notifications"
 ```
 
 Suba cada serviço no perfil `dev`, em terminais separados. O `payments` só conclui as transferências com o `ledger` no ar. O perfil `dev` habilita o Swagger UI e, no `ledger`, cria uma conta `treasury` com saldo para você testar:
@@ -95,6 +96,7 @@ Suba cada serviço no perfil `dev`, em terminais separados. O `payments` só con
 |---|---|---|---|
 | `dbank-ledger` | 8081 | `http://localhost:8081/swagger-ui.html` | [README do ledger](dbank-ledger/README.md) |
 | `dbank-payments` | 8082 | `http://localhost:8082/swagger-ui.html` | [README do payments](dbank-payments/README.md) |
+| `dbank-notifications` | 8083 | sem API própria, só `/actuator/health` | em construção (M4) |
 
 ## Rodar tudo com Docker
 
@@ -116,7 +118,7 @@ Para desligar:
 docker compose --profile app down
 ```
 
-Com os containers no ar, as portas 8081 e 8082 ficam ocupadas, então não rode o `bootRun` ao mesmo tempo. Dentro da rede do compose os serviços falam com o Kafka em `kafka:29092`; o `localhost:9092` continua valendo para quem roda pelo `bootRun`.
+O `notifications` sobe junto, na porta 8083, e por enquanto só responde o `health`: ele ganha o consumo dos resultados no M4.4. Com os containers no ar, as portas 8081, 8082 e 8083 ficam ocupadas, então não rode o `bootRun` ao mesmo tempo. Dentro da rede do compose os serviços falam com o Kafka em `kafka:29092`; o `localhost:9092` continua valendo para quem roda pelo `bootRun`.
 
 ## Testes e qualidade
 

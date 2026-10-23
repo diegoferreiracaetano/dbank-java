@@ -1,0 +1,25 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: dbank-notifications
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notifications
+    username: dbank
+    password: dbank
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: dbank-notifications
+      auto-offset-reset: earliest
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
