@@ -13,6 +13,15 @@ Livro-razão do Dbank: contas, lançamentos imutáveis de partida dobrada e tran
 
 O contrato completo, com exemplos, está em [`docs/api/ledger-openapi.yaml`](../docs/api/ledger-openapi.yaml).
 
+## Integração com o payments (Kafka)
+
+- **Entrada:** `TransferRequestedConsumer` lê `payments.transfer-requested.v1` e chama o caso de uso `ProcessTransferRequestUseCase`, que **devolve** `Settled` ou `Rejected(motivo)` em vez de lançar exceção. Saldo insuficiente e conta inexistente são recusas, e não erros.
+- **Idempotência:** o resultado de cada transferência é guardado em `transfer_outcome`, na mesma transação do lançamento. Uma mensagem repetida devolve o resultado guardado. Isso vale também para recusas: uma transferência recusada por saldo insuficiente continua recusada se a mensagem chegar de novo depois de a conta ser recarregada.
+- **Saída:** o resultado vira um evento na tabela `outbox_event`, na mesma transação, e um relay agendado o publica em `ledger.transfer-result.v1` (`TransferSettled`, ou `TransferRejected` com o motivo). Uma mensagem repetida não gera evento novo.
+- **Falhas:** erro transitório é retentado com espera crescente. Mensagem ilegível vai para `payments.transfer-requested.v1.dlt`. Detalhes em [`docs/events`](../docs/events/README.md).
+
+O `POST /v1/transactions` continua independente desse fluxo e segue lançando exceções (422, 404).
+
 ## Erros
 
 Todos seguem o RFC 9457 (`application/problem+json`), com `type`, `title`, `status` e `detail`.
@@ -40,8 +49,8 @@ O Swagger UI só é habilitado no perfil `dev`.
 ```
 domain/        regras, sem Spring nem JPA: shared, account, ledger
 application/   casos de uso e portas: port.in, port.out, service
-adapter/in/    rest: controllers, DTOs e contrato OpenAPI
-adapter/out/   persistence: entidades JPA, mappers e repositórios
+adapter/in/    rest (controllers, DTOs, contrato OpenAPI), messaging (consumidor do pedido) e scheduling (relay da outbox)
+adapter/out/   persistence (entidades JPA, mappers, repositórios, resultados e outbox) e messaging (publicador Kafka)
 config/        ligação dos beans
 ```
 

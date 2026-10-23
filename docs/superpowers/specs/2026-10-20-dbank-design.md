@@ -57,7 +57,7 @@ Fluxo de uma transferência:
 
 Garantias:
 
-- Entrega at-least-once, com consumidores idempotentes por `eventId` (tabela de eventos processados).
+- Entrega at-least-once, com consumidores idempotentes: o `ledger` guarda o resultado de cada transferência (`transfer_outcome`) e o `payments` usa as transições idempotentes da `Transfer`.
 - Sem transação distribuída: consistência eventual com compensação explícita.
 - Falha repetida de consumo: retry com backoff e, depois, DLQ.
 
@@ -144,9 +144,19 @@ O que o `dbank-ledger` ensinou e que a spec original não previa.
 ## 8. Decisões tomadas no M2
 
 - **Build compartilhado:** a configuração de qualidade, testes e Spring Boot vive no plugin `dbank.spring-service`, em um `build-logic`. Os serviços compartilham configuração de build, nunca código de produção.
-- **`Transfer`:** máquina de estados imutável. Repetir o mesmo resultado é inofensivo, e um resultado contraditório é erro. O motivo da falha é tipado. Ainda sem `version`, a decidir no M3.
+- **`Transfer`:** máquina de estados imutável. Repetir o mesmo resultado é inofensivo, e um resultado contraditório é erro. O motivo da falha é tipado. O `version` entrou no M3.
 - **Idempotência:** a chave identifica o pedido, e não o conteúdo. A reserva é atômica, com `INSERT ... ON CONFLICT DO NOTHING` declarado como consulta nativa no repositório JPA, e devolve um resultado selado (`Claimed` ou `Existing`). A assinatura vem dos campos do pedido, a validação vem antes da reserva, e reserva e gravação ficam na mesma transação, com a chave estrangeira adiada.
 - **Redis:** cache de registros imutáveis, sem invalidação. Só entra o que o banco confirmou, e qualquer falha do Redis cai para o banco. Um decorador `@Primary` fica na frente do adaptador do banco.
 - **REST:** `202 Accepted`, e a repetição devolve o mesmo status com o cabeçalho `Idempotency-Replayed`. A mesma chave com outro pedido é 422.
 - **Padrão de dados:** acesso só por Spring Data JPA, imposto por ArchUnit nos dois serviços.
 - **Bancos:** um por serviço, no mesmo Postgres em desenvolvimento.
+
+## 9. Decisões tomadas no M3
+
+- **Kafka:** KRaft de um nó, fixado em `apache/kafka:3.8.0` (a 3.9.0 recusa o `0.0.0.0` em `advertised.listeners` que o Testcontainers injeta). Mensagens são texto JSON escrito por nós, segundo os esquemas de `docs/events`, e nunca classes Java serializadas, para os serviços não se acoplarem ao código um do outro. Tópicos com 3 partições e a conta de origem como chave.
+- **Outbox nos dois serviços:** a mudança de estado e o evento vão na mesma transação, e um relay agendado publica com `FOR UPDATE SKIP LOCKED`, esperando a confirmação do broker. Repetição de pedido nunca gera evento novo. O CDC (Debezium) seria a evolução, ao custo de operar o Kafka Connect.
+- **Idempotência no `ledger`:** o caso de uso do Kafka devolve `Settled` ou `Rejected(motivo)`, e o resultado de toda transferência, inclusive das recusadas, é guardado na mesma transação. Sem isso, uma recusa seria reavaliada na repetição e poderia virar sucesso depois de a conta ser recarregada. O `POST /v1/transactions` não mudou.
+- **`payments` aplica o resultado** pelas transições idempotentes da `Transfer`, gravando só quando o estado muda. A `Transfer` ganhou `version` (locking otimista). Contradição entre os serviços é erro e vai para a DLQ.
+- **Erros de consumo:** os consumidores lançam `MessageConversionException` para mensagem ilegível, em vez de descartá-la. Um `DefaultErrorHandler` retenta o transitório com espera exponencial (1s, ×2, teto de 30s, 2 minutos no total) e publica o que não se resolve em `<tópico>.dlt`. A retentativa é bloqueante, para preservar a ordem. Reprocessar a DLQ é manual.
+- **Teste ponta a ponta:** o módulo `dbank-e2e` sobe Postgres, Redis e Kafka por Testcontainers e os dois `bootJar` como processos, e dirige o fluxo só por HTTP, inclusive com o Kafka pausado no momento do pedido. Fica fora do `check`, na tarefa `e2eTest`.
+- **Duplicação consciente:** a outbox existe nos dois serviços, com código quase igual. A extração aguarda um terceiro uso (regra dos três).

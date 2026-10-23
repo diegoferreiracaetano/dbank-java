@@ -81,7 +81,7 @@ Meta: a transferência pedida no `payments` é executada no `ledger` e o resulta
 - [x] **M3.4 Outbox no `ledger` e resultado da transferência.** O resultado (concluída ou recusada) é gravado na mesma transação do lançamento e publicado.
 - [x] **M3.5 Consumidor no `payments`.** Aplica o resultado na `Transfer` com as transições idempotentes e decide se ela precisa de `version`.
 - [x] **M3.6 Retentativa com espera crescente e fila de mensagens mortas.** Falha transitória tenta de novo; mensagem impossível vai para a DLQ.
-- [ ] **M3.7 Ponta a ponta e documentação.** Uma transferência pedida no `payments` termina `COMPLETED` ou `FAILED`, e os READMEs e a spec passam a descrever o fluxo.
+- [x] **M3.7 Ponta a ponta e documentação.** Uma transferência pedida no `payments` termina `COMPLETED` ou `FAILED`, e os READMEs e a spec passam a descrever o fluxo.
 - [ ] **M3.8 Fechamento.** Clone limpo e arrumação dos documentos.
 
 ## M4 a M9
@@ -110,3 +110,6 @@ Decisões adiadas de propósito, cada uma com o marco em que volta.
 | Kafka fixado em `apache/kafka:3.8.0` | a 3.9.0 recusa o `0.0.0.0` em `advertised.listeners` que o Testcontainers injeta | subir de versão quando o Testcontainers corrigir |
 | Limpeza das linhas enviadas da outbox | as linhas com `sent_at` preenchido nunca são apagadas | M5 ou M6, junto com a limpeza das chaves de idempotência |
 | Ordem dos eventos com várias instâncias | o `SKIP LOCKED` deixa duas instâncias publicarem lotes diferentes ao mesmo tempo, sem ordem global nem por conta | só se o consumo passar a depender de ordem; hoje o `ledger` trata cada transferência de forma independente |
+| Plugin `dbank.e2e` repete a formatação e o Checkstyle do `dbank.spring-service` | cerca de 25 linhas duplicadas, para não refatorar o plugin existente no meio do M3 | extrair um `dbank.java-quality` quando houver um terceiro módulo |
+| `e2eTest` fora do `check` | sobe três containers e duas JVMs, então é lento | M4: o CI o executa em um passo separado |
+| Mensagens na DLQ sem alerta nem ferramenta de reprocesso | uma mensagem morta é uma transferência presa em `PENDING`, e hoje só se descobre lendo o tópico | M5 (alerta sobre a DLQ e transferências `PENDING` antigas) e M6 (reprocesso) |

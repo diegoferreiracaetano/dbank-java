@@ -1,6 +1,6 @@
 # dbank-payments
 
-Recebe pedidos de transferência e guarda o estado. O dinheiro só se move no `ledger`: aqui a transferência nasce `PENDING` e é concluída depois, quando os dois serviços passarem a conversar (M3). Os valores são sempre inteiros em centavos.
+Recebe pedidos de transferência e guarda o estado. O dinheiro só se move no `ledger`: aqui a transferência nasce `PENDING` e é concluída depois, quando o `ledger` responde por Kafka. Os valores são sempre inteiros em centavos.
 
 ## Endpoints
 
@@ -40,6 +40,13 @@ O Redis guarda em cache o registro "chave, assinatura, transferência", que nunc
 - Se o Redis falhar, o pedido segue pelo banco como se o cache estivesse vazio.
 - O prazo é de 24 horas, configurável em `dbank.idempotency.cache.ttl`.
 
+## Integração com o ledger (Kafka)
+
+- **Saída:** ao aceitar um pedido novo, o serviço grava o evento `TransferRequested` na tabela `outbox_event`, na mesma transação da `Transfer`. Um relay agendado (`dbank.outbox`) publica as linhas pendentes em `payments.transfer-requested.v1`, com a conta de origem como chave, e só as marca como enviadas depois da confirmação do broker. Uma repetição com a mesma `Idempotency-Key` não gera evento novo.
+- **Entrada:** `TransferResultConsumer` lê `ledger.transfer-result.v1` e aplica `TransferSettled` ou `TransferRejected` à transferência. Repetir o mesmo resultado não grava nada.
+- **Concorrência:** a `Transfer` tem `version` (locking otimista). Dois resultados contraditórios simultâneos não se sobrescrevem: o segundo falha, a mensagem é reentregue e a contradição aparece.
+- **Falhas:** erro transitório é retentado com espera crescente. Mensagem ilegível, resultado contraditório ou de transferência inexistente vão para `ledger.transfer-result.v1.dlt`. Detalhes em [`docs/events`](../docs/events/README.md).
+
 ## Erros
 
 Todos seguem o RFC 9457 (`application/problem+json`).
@@ -66,14 +73,14 @@ O Swagger UI só é habilitado no perfil `dev`.
 ```
 domain/        regras, sem Spring nem JPA: shared (Money), transfer (Transfer e seus tipos)
 application/   idempotency, port.in, port.out e service
-adapter/in/    rest: controller, DTOs e contrato OpenAPI
-adapter/out/   persistence (transferência e chaves, em JPA) e cache (Redis)
+adapter/in/    rest (controller, DTOs, contrato OpenAPI), messaging (consumidor do resultado) e scheduling (relay da outbox)
+adapter/out/   persistence (transferência, chaves e outbox, em JPA), cache (Redis) e messaging (publicador Kafka)
 config/        ligação dos beans
 ```
 
 ## Banco
 
-O Flyway cria as tabelas `transfer` e `idempotency_key` em `src/main/resources/db/migration`. O serviço usa o banco `payments`, no mesmo Postgres do compose. Em um volume novo, o script de `docker/postgres` o cria. Em um volume que já existe, crie-o uma vez:
+O Flyway cria as tabelas `transfer` (com `version`), `idempotency_key` e `outbox_event` em `src/main/resources/db/migration`. O serviço usa o banco `payments`, no mesmo Postgres do compose. Em um volume novo, o script de `docker/postgres` o cria. Em um volume que já existe, crie-o uma vez:
 
 ```bash
 docker compose exec postgres psql -U dbank -d postgres -c "CREATE DATABASE payments"
