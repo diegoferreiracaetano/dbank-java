@@ -11,6 +11,7 @@ import com.diegoferreiracaetano.dbank.payments.domain.shared.Money;
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.AccountId;
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.Transfer;
 import com.diegoferreiracaetano.dbank.payments.domain.transfer.TransferStatus;
+import com.diegoferreiracaetano.dbank.testsupport.DeadLetterCollector;
 import java.time.Duration;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

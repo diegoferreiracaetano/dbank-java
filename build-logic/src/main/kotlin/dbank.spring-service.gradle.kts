@@ -1,54 +1,21 @@
 plugins {
-    java
-    checkstyle
+    id("dbank.java-quality")
     jacoco
     id("org.springframework.boot")
     id("io.spring.dependency-management")
-    id("com.diffplug.spotless")
     id("com.github.spotbugs")
 }
 
-val catalog = the<VersionCatalogsExtension>().named("libs")
-
-fun catalogVersion(name: String) = catalog.findVersion(name).get().requiredVersion
-
-fun catalogLibrary(name: String) = catalog.findLibrary(name).get()
-
 extra["testcontainers.version"] = catalogVersion("testcontainers")
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(catalogLibrary("archunit-junit5"))
+    testImplementation(project(":dbank-test-support"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     spotbugs(catalogLibrary("spotbugs-tool"))
     spotbugs(catalogLibrary("commons-lang3"))
-}
-
-spotless {
-    java {
-        target("src/**/*.java")
-        palantirJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-checkstyle {
-    toolVersion = catalogVersion("checkstyle")
-    configDirectory = rootProject.file("config/checkstyle")
-    maxWarnings = 0
 }
 
 spotbugs {
@@ -99,10 +66,6 @@ configurations["integrationTestRuntimeOnly"].extendsFrom(
     configurations.testRuntimeOnly.get()
 )
 
-tasks.withType<JavaCompile> {
-    options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
-}
-
 tasks.withType<Test> {
     useJUnitPlatform()
 }
@@ -152,6 +115,23 @@ tasks.jacocoTestCoverageVerification {
     }
 }
 
+val mainSources = the<SourceSetContainer>()["main"]
+
+val jacocoFullReport by tasks.registering(JacocoReport::class) {
+    group = "verification"
+    description = "Coverage of the unit and the integration tests together, as a report with no minimum"
+    val integrationTest = tasks.named<Test>("integrationTest")
+    dependsOn(tasks.test, integrationTest)
+    executionData(tasks.test.get(), integrationTest.get())
+    sourceDirectories.from(mainSources.allSource.srcDirs)
+    classDirectories.from(mainSources.output)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
 tasks.check {
     dependsOn(tasks.jacocoTestCoverageVerification, testing.suites.named("integrationTest"))
+    finalizedBy(jacocoFullReport)
 }

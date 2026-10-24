@@ -12,6 +12,7 @@ import com.diegoferreiracaetano.dbank.ledger.application.port.out.AccountReposit
 import com.diegoferreiracaetano.dbank.ledger.domain.account.Account;
 import com.diegoferreiracaetano.dbank.ledger.domain.account.AccountId;
 import com.diegoferreiracaetano.dbank.ledger.domain.shared.Money;
+import com.diegoferreiracaetano.dbank.testsupport.DeadLetterCollector;
 import java.time.Duration;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

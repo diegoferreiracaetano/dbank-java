@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.diegoferreiracaetano.dbank.notifications.service.NotificationSender;
+import com.diegoferreiracaetano.dbank.testsupport.DeadLetterCollector;
 import java.time.Duration;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

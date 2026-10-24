@@ -1,4 +1,4 @@
-package com.diegoferreiracaetano.dbank.payments.integration;
+package com.diegoferreiracaetano.dbank.testsupport;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -8,23 +8,25 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.kafka.annotation.KafkaListener;
 
 @TestConfiguration(proxyBeanMethods = false)
-class DeadLetterCollector {
+public class DeadLetterCollector {
+
+    public static final String TOPIC_PROPERTY = "dbank.test.dead-letter-topic";
 
     private final List<ConsumerRecord<String, String>> records = new CopyOnWriteArrayList<>();
 
-    @KafkaListener(topics = "ledger.transfer-result.v1.payments.dlt", groupId = "dlt-#{T(java.util.UUID).randomUUID()}")
+    @KafkaListener(topics = "${" + TOPIC_PROPERTY + "}", groupId = "dlt-#{T(java.util.UUID).randomUUID()}")
     void collect(ConsumerRecord<String, String> record) {
         records.add(record);
     }
 
-    List<String> valuesOf(String key) {
+    public List<String> valuesOf(String key) {
         return records.stream()
                 .filter(record -> key.equals(record.key()))
                 .map(ConsumerRecord::value)
                 .toList();
     }
 
-    String headerOf(String key, String header) {
+    public String headerOf(String key, String header) {
         return records.stream()
                 .filter(record -> key.equals(record.key()))
                 .findFirst()

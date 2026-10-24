@@ -5,4 +5,5 @@
 <suppressions>
     <suppress checks="HideUtilityClassConstructor" files=".*Application\.java"/>
     <suppress checks="MethodName" files=".*[\\/]src[\\/](test|integrationTest|e2eTest)[\\/].*"/>
+    <suppress checks="MethodName" files=".*[\\/]dbank-test-support[\\/]src[\\/]main[\\/].*"/>
 </suppressions>

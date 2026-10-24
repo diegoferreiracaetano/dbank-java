@@ -1,14 +1,15 @@
 package com.diegoferreiracaetano.dbank.notifications.architecture;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
+import com.diegoferreiracaetano.dbank.testsupport.DataAccessRules;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.junit.ArchTests;
 import jakarta.persistence.Entity;
 
 @AnalyzeClasses(
@@ -44,14 +45,7 @@ class ArchitectureTest {
     }
 
     @ArchTest
-    void givenProductionCode_whenCheckingDataAccess_thenShouldNotUseJdbcDirectly(JavaClasses classes) {
-        noClasses()
-                .should()
-                .dependOnClassesThat()
-                .resideInAnyPackage("java.sql..", "javax.sql..", "org.springframework.jdbc..")
-                .because("data access goes through Spring Data JPA, and native SQL is declared with @Query")
-                .check(classes);
-    }
+    static final ArchTests DATA_ACCESS = ArchTests.in(DataAccessRules.class);
 
     @ArchTest
     void givenJpaEntities_whenCheckingLocation_thenShouldLiveInThePersistenceLayer(JavaClasses classes) {

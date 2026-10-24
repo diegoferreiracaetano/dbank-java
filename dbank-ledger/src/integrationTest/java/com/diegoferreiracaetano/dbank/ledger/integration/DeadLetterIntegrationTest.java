@@ -3,6 +3,7 @@ package com.diegoferreiracaetano.dbank.ledger.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import com.diegoferreiracaetano.dbank.testsupport.DeadLetterCollector;
 import java.time.Duration;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

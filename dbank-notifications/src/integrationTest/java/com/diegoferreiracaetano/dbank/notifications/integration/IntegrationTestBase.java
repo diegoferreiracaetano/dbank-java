@@ -4,7 +4,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-@SpringBootTest(properties = "management.endpoint.health.show-components=always")
+@SpringBootTest(
+        properties = {
+            "management.endpoint.health.show-components=always",
+            "dbank.test.dead-letter-topic=ledger.transfer-result.v1.notifications.dlt"
+        })
 @AutoConfigureMockMvc
 @Import(ContainersConfig.class)
 abstract class IntegrationTestBase {}

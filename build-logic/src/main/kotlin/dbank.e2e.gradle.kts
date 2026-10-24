@@ -1,37 +1,5 @@
 plugins {
-    java
-    checkstyle
-    id("com.diffplug.spotless")
-}
-
-val catalog = the<VersionCatalogsExtension>().named("libs")
-
-fun catalogVersion(name: String) = catalog.findVersion(name).get().requiredVersion
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
-spotless {
-    java {
-        target("src/**/*.java")
-        palantirJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-}
-
-checkstyle {
-    toolVersion = catalogVersion("checkstyle")
-    configDirectory = rootProject.file("config/checkstyle")
-    maxWarnings = 0
+    id("dbank.java-quality")
 }
 
 testing {
@@ -50,8 +18,4 @@ testing {
             }
         }
     }
-}
-
-tasks.withType<JavaCompile> {
-    options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
 }

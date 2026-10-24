@@ -16,9 +16,9 @@ Projeto em Java 21, Spring Boot, Postgres, Kafka e Redis, construído passo a pa
 
 Impostos por teste (ArchUnit), então um desvio reprova o build:
 
-- **Hexagonal.** `domain` e `application` só dependem de si mesmos e do JDK; os adapters não são públicos nem se conhecem; `@Entity` e controllers ficam nos seus adapters.
+- **Hexagonal** no `ledger` e no `payments`. `domain` e `application` só dependem de si mesmos e do JDK; os adapters não são públicos nem se conhecem; `@Entity` e controllers ficam nos seus adapters. O `notifications`, que só recebe um evento e o envia, é em **camadas** (`messaging`, `service`, `persistence`, dependência só para baixo).
 - **Acesso a dados só por Spring Data JPA.** SQL nativo existe, mas declarado com `@Query` dentro do repositório; JDBC direto (`JdbcTemplate`, `JdbcClient`, `java.sql`) é proibido em código de produção.
-- **Serviços não compartilham código**, só contratos (REST e eventos).
+- **Serviços não compartilham código de produção**, só contratos (REST e eventos). O que se compartilha é a configuração de build (`build-logic`) e o código de teste (`dbank-test-support`: containers, coletor da fila de mensagens mortas e as regras de arquitetura reutilizáveis). Modelo de domínio e outbox seguem duplicados de propósito.
 - **Testes** no padrão `given/when/then`: unitários sem Docker e de integração contra um Postgres real.
 
 ## Status
@@ -29,7 +29,7 @@ Impostos por teste (ArchUnit), então um desvio reprova o build:
 | M1 | `dbank-ledger`: domínio, persistência, REST, documentação, testes de integração e de arquitetura | feito |
 | M2 | `dbank-payments`: domínio, idempotência com Redis, persistência, REST e testes | feito |
 | M3 | `payments` e `ledger` por Kafka: outbox, consumidores idempotentes, retentativa com DLQ e teste ponta a ponta | feito |
-| M4 | CI (GitHub Actions), imagens Docker e `dbank-notifications` | em andamento |
+| M4 | CI (GitHub Actions), imagens Docker e `dbank-notifications` | feito |
 | M5 a M9 | Observabilidade, resiliência, Kubernetes | planejado |
 
 Existem o `dbank-ledger` e o `dbank-payments`, que conversam por Kafka.
@@ -131,6 +131,7 @@ O `notifications` sobe junto, na porta 8083, e avisa o cliente de cada resultado
 | `./gradlew check` | tudo: formatação, Checkstyle, SpotBugs, testes e cobertura mínima |
 | `./gradlew e2eTest` | ponta a ponta: sobe Postgres, Redis e Kafka (Testcontainers) e os dois serviços como processos reais, e dirige o fluxo só por HTTP; fora do `check`, por ser lento |
 | `./gradlew spotlessApply` | corrige a formatação |
+| `./gradlew :dbank-ledger:jacocoFullReport` | cobertura dos testes unitários e de integração juntos, em `build/reports/jacoco/jacocoFullReport/` (também gerado ao fim do `check`); é só relatório, sem mínimo |
 | CI (GitHub Actions) | em cada push na `main` e em cada pull request: lint dos contratos, `./gradlew check` e, se o `check` passar, `./gradlew e2eTest` |
 
 ## Documentação
@@ -139,4 +140,4 @@ O `notifications` sobe junto, na porta 8083, e avisa o cliente de cada resultado
 - Contratos dos eventos entre os serviços: [`docs/events`](docs/events/README.md)
 - Desenho e decisões: [spec](docs/superpowers/specs/2026-10-20-dbank-design.md)
 - Plano e pendências técnicas: [CHECKLIST.md](CHECKLIST.md)
-- Roteiros de consulta: [M0 e build](docs/interview/m0-qualidade-e-build.md), [M1](docs/interview/m1-ledger.md), [M2](docs/interview/m2-payments.md) e [M3](docs/interview/m3-kafka.md)
+- Roteiros de consulta: [M0 e build](docs/interview/m0-qualidade-e-build.md), [M1](docs/interview/m1-ledger.md), [M2](docs/interview/m2-payments.md), [M3](docs/interview/m3-kafka.md) e [M4](docs/interview/m4-ci-docker-notifications.md)
