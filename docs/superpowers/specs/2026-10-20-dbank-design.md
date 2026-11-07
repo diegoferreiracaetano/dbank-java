@@ -20,7 +20,7 @@ Problema resolvido: processar pagamentos de forma assíncrona e escalável sem a
 
 Fora de escopo: login de usuário final completo, multi-moeda, estorno, KYC, antifraude, conta corrente, crédito e regulação. O Dbank cobre a parte difícil de um banco (ledger, transferência, consistência), não o banco inteiro.
 
-### 1.2 Objetivo do projeto (entrevista)
+### 1.2 Objetivo do projeto
 
 Provar, com código rodando, domínio do que a vaga pede: Java, Spring Boot, JPA/Hibernate, Redis, Kafka, REST, microsserviços, Hexagonal, processos assíncronos, CI/CD, DevOps, ambiente crítico/alta volumetria e noções de cloud. Cada decisão precisa ter resposta pronta para "por que fez assim?".
 
@@ -95,7 +95,7 @@ Stack: Java 21 (virtual threads), Spring Boot, JPA/Hibernate, Kafka, Redis, Post
 
 ## 4. Roteiro de evolução
 
-Cada marco deixa o projeto rodando e apresentável; dá para parar em qualquer um. Núcleo básico = M1 a M4. Do M5 em diante, só avança quando o Diego pedir.
+Cada marco deixa o projeto rodando e apresentável; dá para parar em qualquer um. Núcleo básico = M1 a M4. Do M5 em diante, só avança sob demanda.
 
 | Marco | Entrega | Cobre da vaga |
 |---|---|---|
@@ -111,16 +111,16 @@ Cada marco deixa o projeto rodando e apresentável; dá para parar em qualquer u
 
 Fora do roteiro por decisão (YAGNI): CQRS, gRPC, SonarQube/PIT.
 
-## 5. Como trabalhamos
+## 5. Processo de entrega
 
-O foco do projeto é o Diego aprender; o código é construído em conjunto, não entregue pronto.
+O projeto é construído em incrementos pequenos e verificáveis.
 
 - O progresso vive no `CHECKLIST.md`, em itens pequenos, agrupados por marco.
-- Um item por vez: o Claude explica o conceito e o porquê antes, o Diego escreve ou revisa o código junto, e o item só é marcado como feito depois que o Diego testa e confirma.
-- Nenhum código de marco futuro é escrito antecipadamente, e o Claude não executa o roteiro sozinho.
-- Cada marco termina com perguntas de entrevista sobre o que foi construído.
-- Commits só ao fim de uma alteração grande, sem `Co-Authored-By`.
-- Os testes rodados são os do item em curso; suítes completas ficam para o fechamento do marco.
+- Um item por vez: cada item é desenhado antes de ser implementado e só é marcado como feito depois de verificado (testes passando e, nos marcos de infraestrutura, o ambiente rodando).
+- Nenhum código de marco futuro é escrito antecipadamente.
+- Cada marco termina com um roteiro de consulta sobre as decisões tomadas, em `docs/interview`.
+- Os commits acontecem ao fim de uma alteração verificada.
+- Os testes rápidos rodam a cada item; a suíte completa, o ambiente em containers e o clone limpo ficam para o fechamento do marco.
 
 ## 6. Premissas
 
